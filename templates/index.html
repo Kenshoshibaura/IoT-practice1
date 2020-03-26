@@ -1,0 +1,402 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
+<!---<link rel="apple-touch-icon" href="img/accept.PNG" />-->
+<script type="text/javascript" src="test.js"></script>
+<link rel="stylesheet" href="test.css" type="text/css">
+<html><head><title>テストアプリ</title></head>
+  <body onLoad="updateLux('/lux','data')">
+    <span id="Realtime" class="time">00/00(0) 00:00:00</span>
+
+    <span class="hidden">現在の情報：<span id = "data">2000/04/01 00:00:00,0</span></span><br>
+
+    <span class="area_status">
+      --現在の状況--<br>
+      <span id="Status">施錠中</span><br>
+    </span>
+
+    <span class="area_log">
+      --履歴--<br>
+      解錠時刻：<span id="UnLock">---</span><br>
+      施錠時刻：<span id="Lock">2020/03/22 00:00:00</span><br>
+    </span>
+
+    <span class="area_manual">
+      --手動操作--<br>
+      <input type="button" value="施錠" onclick="Manual_Lock()">
+      <input type="button" value="解錠" onclick="Manual_Unlock()">
+    </span>
+  </body>
+
+  <script>
+
+    var Before_Status=0;
+    setInterval("Check()",5000);
+
+    function Check(){
+      updateLux('/lux','data');
+      var data=document.getElementById('data');
+      var Now_data=data.innerHTML;
+      var Now_data2=Now_data.split(',');
+      var Now_time=Now_data2[0];
+      var Now_status=Now_data2[1];
+      if(Now_status==Before_Status){
+        //banner("状態一定","変化なし");
+        if(Now_status==3){
+          showAlert('警告','電気は消しましたか？','confirm','Manual_Lock()');
+        }else if(Now_status==4){
+          showAlert('警告','鍵は締めましたか？','confirm','Manual_Lock()');
+        }
+      }else{
+        var message=document.getElementById('Status');
+        if(Now_status==1){
+          document.body.style.backgroundColor = "#c8ffaa";
+          message.innerHTML="鍵は開いています";
+          banner("解錠","解錠されました");
+          rewrite_log(1,0);
+        }else if(Now_status==2){
+          document.body.style.backgroundColor = "#ffc8e0";
+          message.innerHTML="鍵は閉まっています";
+          banner("施錠","施錠されました");
+          rewrite_log(2,0);
+        }else if(Now_status==3){
+          document.body.style.backgroundColor = "#ffffa0";
+          message.innerHTML="電気を点けっぱなしの可能性があります";
+          showAlert('警告','電気は消しましたか？','confirm','Manual_Lock()');
+        }else if(Now_status==4){
+          document.body.style.backgroundColor = "#a0ffff";
+          message.innerHTML="鍵が開いたままの可能性があります";
+          showAlert('警告','鍵は締めましたか？','confirm','Manual_Lock()');
+        }else if(Now_status==5){
+          document.body.style.backgroundColor = "#646464";
+          message.innerHTML="利用時間外です";
+          banner("利用時間外","現在は利用時間外です");
+        }else if(Now_status==0){
+          document.body.style.backgroundColor = "#c8a0ff";
+          message.innerHTML="状況不明";
+          banner("ERROR","システムエラーです");
+        }
+        Before_Status = Now_status;
+      }
+    }
+
+    function Manual_Lock(){
+      var message=document.getElementById('Status');
+      document.body.style.backgroundColor = "#ffc8e0";
+      message.innerHTML="鍵を閉めました";
+      banner("施錠","施錠しました");
+      Before_Status = 2;
+      manuallock('/lux','2');
+      var data=document.getElementById('data');
+      data.innerHTML="0,2";
+      rewrite_log(2,1);
+
+    }
+    function Manual_Unlock(){
+      var message=document.getElementById('Status');
+      document.body.style.backgroundColor = "#c8ffaa";
+      message.innerHTML="鍵を開けました";
+      banner("解錠","解錠しました");
+      Before_Status = 1;
+      manuallock('/lux','1');
+      var data=document.getElementById('data');
+      data.innerHTML="0,1";
+      rewrite_log(1,1);
+
+    }
+
+    function rewrite_log(s,t){
+      var Lock=document.getElementById('Lock');
+      var UnLock=document.getElementById('UnLock');
+      if(t==0){
+        var data=document.getElementById('data');
+        var Now_data=data.innerHTML;
+        var Now_data2=Now_data.split(',');
+        var time=Now_data2[0];
+      }else{
+        var Time=document.getElementById('Realtime');
+        time=Time.innerHTML;
+      }
+      if(s==1){
+        Lock.innerHTML="---";
+        UnLock.innerHTML=time;
+      }else if(s==2){
+        Lock.innerHTML=time;
+        UnLock.innerHTML="---";
+      }
+    }
+
+    const updateLux = async(url,element) => {
+      const sensorData = await fetch(url)
+      .then(response => response.text())
+      const target = document.getElementById(element)
+      target.innerHTML = `${sensorData}`
+    }
+
+    const manuallock = async(url,element) => {
+      var url2 = String(url) + "/" + String(element);
+      const return_from_server = await fetch(url2)
+      .then(response => response.text())
+      var response2 = `${return_from_server}`
+      console.log(response2);
+    }
+
+  </script>
+  <style>
+
+    .area_status{
+      position:fixed;
+      left:30%;
+      top:25%;
+    }
+    .area_log{
+      position:fixed;
+      left:30%;
+      top:45%;
+    }
+    .area_manual{
+      position:fixed;
+      left:30%;
+      top:65%;
+    }
+
+
+    .hidden{display:none;}
+
+  </style>
+
+  <script>
+    /*ここからは編集不可*/
+    setInterval('showClock()',1000);
+    function set2fig(num){
+      var ret;
+      if(num<10){ret="0"+num;}
+        else{ret=num;}
+      return ret;
+    }
+    function set3fig(num){
+      var ret;
+      if(num<10){ret=" 00"+num;}
+       else if(num<100){ret=" 0"+num;}
+        else{ret=" "+num;}
+      return ret;
+    }
+
+    function showClock(){
+      var nowTime=new Date();
+      var nowHour=set2fig(nowTime.getHours());
+      var nowMin=set2fig(nowTime.getMinutes());
+      var nowSec=set2fig(nowTime.getSeconds());
+      var nowMonth=set2fig(nowTime.getMonth()+1);
+      var nowDate=set2fig(nowTime.getDate());
+      var wDay=nowTime.getDay();
+      var Day=['日','月','火','水','木','金','土'];
+      var Realtime=nowMonth+"/"+nowDate+"("+Day[wDay]+")"+" "+nowHour+":"+nowMin+":"+nowSec;
+      document.getElementById("Realtime").innerHTML=Realtime;
+    }
+
+    //ここからバナーとアラート・ポップアップ
+    /*
+    -----使い方----
+    banner(title,text [,detail]);
+      >>バナーを使う（バナーは10秒で自動的に消える）
+        title(String) :バナーのタイトル
+        text(String)  :バナーの内容、タグの使用可能
+        detail(String):省略可、バナータッチ時に表示するポップアップの本文、タグの使用可能.
+
+        Ex.)　banner("test","これはテスト","これはテストです。");
+
+    showAlert(title,txt[,popup[,fn]])
+      >>ポップアップを使う。Okを押さなくても100秒後に閉じる
+      title(String) :ポップアップのタイトル
+      txt(String)   :バナーの内容、タグの使用可能
+      popup(String) :省略可、デフォルトはhidden.
+
+        -hidden  デフォルト値. 100秒で自動的に閉じるアラート。OKボタンのみある。fnを実行する。
+        -noClose 自動的には閉じないアラート。OKボタンのみある。fnを実行する。
+        -その他   自動的に閉じないコンファーム。キャンセルを押すと何もしない、OKを押すとfnを実行する
+
+      fn(String)    :省略可。関数名もしくは function(){} を直接記述。OKを押した後に実行される。' or " で囲む必要あり。
+
+      Ex.)　showAlert('テストです','このコンファームはテストです。','confirm','banner("やったー","コンファームが無事使えたよ！")');
+            showAlert('テスト','自動的に消えます。');
+
+    */
+    //ここからバナー
+    function banner(title,text,detail = text){
+      var div = document.createElement('div');
+      div.className = "banner";
+      div.setAttribute("onclick","this.style.animation='animation-banner-up 0.5s';showAlert('"+title+"','"+detail+"','noClose')");
+      var h1 = document.createElement('h2');
+      h1.innerHTML = title;
+      var p = document.createElement('p');
+      p.innerHTML = text;
+      div.appendChild(h1);
+      div.appendChild(p);
+      document.getElementsByTagName('body')[0].appendChild(div);
+    }
+
+    //ここからアラート
+    function showAlert(title,txt,popup="hidden",fn=function(){}){
+      //タイトル、本文、(デフォルト=10秒閉じ,noClose=自動で閉じないアラート,その他＝confirm),関数ー＞""で囲む,Okayに渡される
+      var div1 = document.createElement('div');
+      div1.className = "bgAlert";
+      var div2 = document.createElement('div');
+      div2.className = "alert";
+      var h2 = document.createElement('h2');
+      h2.innerHTML = title;
+      var p = document.createElement('p');
+      p.innerHTML = txt;
+      var time = document.createElement('div');
+      time.innerHTML = "Auto Close : 100 sec.";
+      var cancel = document.createElement('button');
+      cancel.innerHTML = "いいえ";
+      cancel.setAttribute("onclick","hideConfirm(this);");
+      if(popup==("hidden"))cancel.style.visibility="hidden";
+      if(popup==("noClose"))cancel.style.visibility="hidden";
+      var okay = document.createElement('button');
+      okay.style.background = "#5566FF";
+      //
+      okay.setAttribute("onclick","hideConfirm(this,"+fn+");");
+      okay.innerHTML  = "はい";
+      div2.appendChild(h2);
+      div2.appendChild(p);
+      div2.appendChild(cancel);
+      div2.appendChild(okay);
+      div1.appendChild(div2);
+      document.getElementsByTagName('body')[0].appendChild(div1);
+      console.log();
+      if(popup=="hidden"){
+        div2.appendChild(time);
+        console.log(time.innerHTML.replace(/[^0-9]/g,""));
+        var timeout = setInterval(function(time){time.innerHTML = "Auto Close : "+(parseInt(time.innerHTML.replace(/[^0-9]/g,""))-1)+" sec.";},1000,time);
+        setTimeout(function(div1,timeout){clearInterval(timeout);console.log(div1);div1.remove(div1);},101000,div1,timeout);
+      }
+    }
+    function hideConfirm(obj,fc=function(){}){
+      obj.parentNode.parentNode.style.display='none';
+      fc();
+    }
+  </script>
+  <style>
+    *{
+      -webkit-tap-highlight-color:rgba(0,0,0,0);
+      -webkit-touch-callout:none;
+      -webkit-user-select:none;
+    }
+    html {touch-action: manipulation;}
+    body{background-color:rgba(255,170,0,1);}
+    /*body{background-image:url("img/back.jpg");background-size:cover;}*/
+    body{color:#000; font-family:"Gulim",sans-serif; font-weight:600;}
+    body{text-shadow:1px 1px 0 #fff,-1px 1px 0 #fff,1px -1px 0 #fff,-1px -1px 0 #fff;}
+
+    .time{
+      position:fixed;
+      font-size:100%;
+      top:5%;
+      left:40px;
+      z-index:5;
+    }
+
+    /*ここからアラートとバナーのcss*/
+    /*ここからバナー*/
+    .banner{
+      position : fixed;
+      top : -700px;
+      left : 25vw;
+      width: 50vw;
+      background: rgba(55,55,55,0.9);
+      text-shadow:none;
+      color:white;
+      text-align:center;
+      z-index:29;
+      border-radius : 20px;
+      border : solid 3px white;
+      animation: animation-banner 5s;
+    }
+    .banner p{
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    @keyframes animation-banner {
+      0%{top:-700px;display:block;}
+      6%{top:20px;}
+      9%{top:0px;}
+      13%{top:12px;}
+      19%{top:5px;}
+      90%{top:5px;}
+      92%{top:7px;}
+      100%{top:-700px;}
+    }
+    @keyframes animation-banner-up {
+      0%{top:0px;}
+      100%{top:-700px;}
+    }
+
+    /*ここからアラート*/
+      .bgAlert{
+        position:fixed;
+        top:0px;
+        right:0px;
+        width:100%;
+        height:100%;
+        background: rgba(0,0,0,0.5);
+        animation:animation-background 0.3s;
+        z-index:29;
+      }
+      .alert{
+        background:rgba(55,55,55,0.9);
+        border-radius:30px;
+        color: white;
+        padding: 20px;
+        position :fixed;
+        top: 50%;
+        left:50%;
+        transform:translate(-50%,-50%);
+        text-shadow: none;
+        text-align: center;
+        overflow: hidden;
+        border: solid 3px white;
+        animation: animation-popup 0.3s;
+      }
+      .alert p{
+        font-size:120%;
+      }
+      .alert button{
+        color: white;
+        background: rgba(200,200,200,0.5);
+        width:calc(50% - 10px);
+        border-radius: 30px;
+        margin: 5px 5px;
+        outline-color: white;
+        padding:10px;
+        border: 2px solid white;
+      }
+      .alert button:active {
+        border-color: #AAA;
+        color:#AAA;
+        background: rgba(0,0,0,0.7);
+      }
+      .alert div{
+        font-size:70%;
+        text-align: right;
+      }
+
+      @keyframes animation-background{
+        0%{display:  none; background: rgba(0,0,0,0);}
+        1%{display:  block;background: rgba(0,0,0,0);}
+        100%{display:block;background: rgba(0,0,0,0.5);}
+      }
+      @keyframes animation-popup{
+        0%{display:none  ;padding-top: 0px;padding-bottom :0px;height:0px;}
+        20%{display:block;padding : 0px;height:0px;}
+        25%{display:block;padding : 0px 60px;height:0px;}
+        40%{display:block;padding : 10px 20px;height:0px;}
+        90%{display:block;padding-top: 25px;padding-bottom :25px;height:auto;}
+        100%{display:block;padding-top: 20px;padding-bottom :20px;height:auto;}
+      }
+      /*ここまでアラート*/
+
+
+  </style>
+
+</html>
