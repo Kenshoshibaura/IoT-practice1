@@ -8,10 +8,14 @@ file_result = "./result_data.csv"
 
 port_num = 17086
 
-date1=datetime.datetime.now()
-print("HELLO")
-print(date1)
+def reload_time():
+    date=datetime.datetime.now()
+    now_time = str(date.month) + "月" + str(date.day) + "日 " + str(date.hour) + "時" + str(date.minute) + "分"
+    return now_time
 
+print("HELLO")
+now_time = reload_time()
+print(now_time)
 @app.route('/', methods=['GET'])
 def get_html():
     return render_template('./index.html')
@@ -20,9 +24,10 @@ def get_html():
 def update_lux():
     time=request.form["time"]
     lux=request.form["lux"]
+    now_time = reload_time()
     try:
         f = open(file_sensor,'w')
-        f.write(time + "," + lux)
+        f.write(now_time + "," + lux)
         return "succeeded to write"
     except Exception as e:
         print(e)
@@ -46,12 +51,15 @@ def get_lux():
 
 @app.route('/lux/<select>',methods=['GET'])
 def get_lux_select(select):
+    now_time = reload_time()
     f = open(file_result,'w')
-    f.write("2020/3/20 00:00:00,"+select)
+    f.write(now_time+","+select)
     f.close()
+    #この後の３行は暫定　最終的には閾値を変えるだけで直接は書き換えない
     f = open(file_key,'w')
-    f.write("2020/3/20 00:00:00,"+select)
+    f.write(now_time+","+select)
     f.close()
+
     print(select)
 
     #ユーザ入力による状態変動なので閾値を更新する処理を行う

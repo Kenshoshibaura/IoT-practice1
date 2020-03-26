@@ -9,21 +9,39 @@
     <span class="hidden">現在の情報：<span id = "data">2000/04/01 00:00:00,0</span></span><br>
 
     <span class="area_status">
-      --現在の状況--<br>
-      <span id="Status">施錠中</span><br>
+      --現在の研究室の状況--<br>
+      <span id="Status">〜データ受信中〜</span><br>
     </span>
 
     <span class="area_log">
-      --履歴--<br>
-      解錠時刻：<span id="UnLock">---</span><br>
-      施錠時刻：<span id="Lock">2020/03/22 00:00:00</span><br>
+      --<span id="Ope_Judge">操作</span>時刻--<br>
+      <span id="LockTime">〜データ受信中〜</span><br>
     </span>
 
+    <span class="area_table">
+      --操作履歴--<br>
+      <table class="log_table" id="log_table" border="1">
+        <tbody><tr>
+          <td>0</td>
+        </tr><tr>
+          <td>1</td>
+        </tr><tr>
+          <td>2</td>
+        </tr><tr>
+          <td>3</td>
+        </tr></tbody>
+      </table>
+    </span>
+
+    <button id="master">管理者コマンド</button>
+
+<!---<span class="hidden">--->
     <span class="area_manual">
       --手動操作--<br>
       <input type="button" value="施錠" onclick="Manual_Lock()">
       <input type="button" value="解錠" onclick="Manual_Unlock()">
     </span>
+    <!---</span>--->
   </body>
 
   <script>
@@ -42,8 +60,6 @@
         //banner("状態一定","変化なし");
         if(Now_status==3){
           showAlert('警告','電気は消しましたか？','confirm','Manual_Lock()');
-        }else if(Now_status==4){
-          showAlert('警告','鍵は締めましたか？','confirm','Manual_Lock()');
         }
       }else{
         var message=document.getElementById('Status');
@@ -59,12 +75,12 @@
           rewrite_log(2,0);
         }else if(Now_status==3){
           document.body.style.backgroundColor = "#ffffa0";
-          message.innerHTML="電気を点けっぱなしの可能性があります";
+          message.innerHTML="電気が点けっ放しです";
           showAlert('警告','電気は消しましたか？','confirm','Manual_Lock()');
         }else if(Now_status==4){
           document.body.style.backgroundColor = "#a0ffff";
-          message.innerHTML="鍵が開いたままの可能性があります";
-          showAlert('警告','鍵は締めましたか？','confirm','Manual_Lock()');
+          message.innerHTML="現在席を外しています";
+          banner("無人","現在席を外しています");
         }else if(Now_status==5){
           document.body.style.backgroundColor = "#646464";
           message.innerHTML="利用時間外です";
@@ -104,24 +120,42 @@
     }
 
     function rewrite_log(s,t){
-      var Lock=document.getElementById('Lock');
-      var UnLock=document.getElementById('UnLock');
+      var LockJudge=document.getElementById('Ope_Judge');
+      var Lock=document.getElementById('LockTime');
       if(t==0){
         var data=document.getElementById('data');
         var Now_data=data.innerHTML;
         var Now_data2=Now_data.split(',');
         var time=Now_data2[0];
       }else{
-        var Time=document.getElementById('Realtime');
-        time=Time.innerHTML;
+        var time=make_time();
       }
+      var table=document.getElementById('log_table');
+      var row_len=table.rows.length;
+      var row=table.insertRow(0);
+      var cell=row.insertCell(-1);
+
       if(s==1){
-        Lock.innerHTML="---";
-        UnLock.innerHTML=time;
-      }else if(s==2){
+        LockJudge.innerHTML="解錠";
         Lock.innerHTML=time;
-        UnLock.innerHTML="---";
+        cell.innerHTML=time+" 解錠";
+      }else if(s==2){
+        LockJudge.innerHTML="施錠";
+        Lock.innerHTML=time;
+        cell.innerHTML=time+" 施錠";
       }
+      table.deleteRow(row_len);
+
+    }
+
+    function make_time(){
+      var nowTime=new Date();
+      var nowHour=nowTime.getHours();
+      var nowMin=nowTime.getMinutes();
+      var nowMonth=nowTime.getMonth()+1;
+      var nowDate=nowTime.getDate();
+      var Realtime=nowMonth+"月"+nowDate+"日 "+nowHour+"時"+nowMin+"分";
+      return Realtime;
     }
 
     const updateLux = async(url,element) => {
@@ -144,18 +178,38 @@
 
     .area_status{
       position:fixed;
-      left:30%;
-      top:25%;
+      left:29%;
+      top:20%;
+      text-align:center;
     }
     .area_log{
       position:fixed;
-      left:30%;
-      top:45%;
+      left:34%;
+      top:35%;
+      text-align:center;
     }
-    .area_manual{
+    .area_table{
       position:fixed;
-      left:30%;
-      top:65%;
+      left:15%;
+      top:50%;
+      text-align:center;
+    }
+
+    .log_table{
+      position:relative;
+      width: calc(70vw);
+      border-collapse: collapse;
+      border-color:rgba(255,255,255,1);
+      align:center;
+      text-align:center;
+      background-color:rgba(255,255,255,0.5);
+
+    }
+
+    #master{
+      position:fixed;
+      top:80%;
+      right:20%;
     }
 
 
@@ -285,8 +339,9 @@
     html {touch-action: manipulation;}
     body{background-color:rgba(255,170,0,1);}
     /*body{background-image:url("img/back.jpg");background-size:cover;}*/
-    body{color:#000; font-family:"Gulim",sans-serif; font-weight:600;}
+    body{color:#000; font-family:"Gulim",sans-serif; font-weight:700; font-size:125%;}
     body{text-shadow:1px 1px 0 #fff,-1px 1px 0 #fff,1px -1px 0 #fff,-1px -1px 0 #fff;}
+    /*body{text-align:center;}*/
 
     .time{
       position:fixed;
