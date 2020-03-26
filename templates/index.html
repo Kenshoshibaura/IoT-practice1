@@ -1,23 +1,20 @@
 <!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
 <!---<link rel="apple-touch-icon" href="img/accept.PNG" />-->
-<script type="text/javascript" src="test.js"></script>
-<link rel="stylesheet" href="test.css" type="text/css">
+<script type="text/javascript" src="ken.js"></script>
+<link rel="stylesheet" href="ken.css" type="text/css">
 <html><head><title>テストアプリ</title></head>
   <body onLoad="updateLux('/lux','data')">
     <span id="Realtime" class="time">00/00(0) 00:00:00</span>
-
     <span class="hidden">現在の情報：<span id = "data">2000/04/01 00:00:00,0</span></span><br>
 
     <span class="area_status">
       --現在の研究室の状況--<br>
       <span id="Status">〜データ受信中〜</span><br>
     </span>
-
     <span class="area_log">
       --<span id="Ope_Judge">操作</span>時刻--<br>
       <span id="LockTime">〜データ受信中〜</span><br>
     </span>
-
     <span class="area_table">
       --操作履歴--<br>
       <table class="log_table" id="log_table" border="1">
@@ -33,16 +30,19 @@
       </table>
     </span>
 
-    <button id="master">管理者コマンド</button>
-
-<!---<span class="hidden">--->
-    <span class="area_manual">
-      --手動操作--<br>
-      <input type="button" value="施錠" onclick="Manual_Lock()">
-      <input type="button" value="解錠" onclick="Manual_Unlock()">
+    <button id="master" class="mybutton" onclick="OperatorCommand()">管理者コマンド</button>
+    <span id="demo" class="hidden">
+      <button id="d0" class="mybutton demobutton" onclick="demo_order('/demo','0')">0<br>不明</button>
+      <button id="d1" class="mybutton demobutton" onclick="demo_order('/demo','1')">1<br>在室</button>
+      <button id="d2" class="mybutton demobutton" onclick="demo_order('/demo','2')">2<br>施錠</button>
+      <button id="d3" class="mybutton demobutton" onclick="demo_order('/demo','3')">3<br>照明</button>
+      <button id="d4" class="mybutton demobutton" onclick="demo_order('/demo','4')">4<br>不在</button>
+      <button id="d5" class="mybutton demobutton" onclick="demo_order('/demo','5')">5<br>不可</button>
     </span>
-    <!---</span>--->
+    <span id="command1" class="hidden"><button id="exit" class="mybutton" onclick="">退室勧告(未実装)</button></span>
+
   </body>
+
 
   <script>
 
@@ -58,9 +58,9 @@
       var Now_status=Now_data2[1];
       if(Now_status==Before_Status){
         //banner("状態一定","変化なし");
-        if(Now_status==3){
+        /*if(Now_status==3){
           showAlert('警告','電気は消しましたか？','confirm','Manual_Lock()');
-        }
+        }*/
       }else{
         var message=document.getElementById('Status');
         if(Now_status==1){
@@ -93,7 +93,6 @@
         Before_Status = Now_status;
       }
     }
-
     function Manual_Lock(){
       var message=document.getElementById('Status');
       document.body.style.backgroundColor = "#ffc8e0";
@@ -158,6 +157,11 @@
       return Realtime;
     }
 
+    function OperatorCommand(){
+      document.getElementById('demo').style.display="block";
+      document.getElementById('command1').style.display="block";
+    }
+
     const updateLux = async(url,element) => {
       const sensorData = await fetch(url)
       .then(response => response.text())
@@ -165,15 +169,71 @@
       target.innerHTML = `${sensorData}`
     }
 
-    const manuallock = async(url,element) => {
+    /*const manuallock = async(url,element) => {
+      var url2 = String(url) + "/" + String(element);
+      const return_from_server = await fetch(url2)
+      .then(response => response.text())
+      var response2 = `${return_from_server}`
+      console.log(response2);
+    }*/
+
+  </script>
+
+  <script>
+    //デモ用
+    const demo_order = async(url,element) => {
       var url2 = String(url) + "/" + String(element);
       const return_from_server = await fetch(url2)
       .then(response => response.text())
       var response2 = `${return_from_server}`
       console.log(response2);
     }
-
   </script>
+  <style>
+    #demo{
+      position:fixed;
+      bottom:12%;
+      left:10%;
+    }
+    .demobutton{
+      width:60px;
+      height:40px;
+    }
+    #d1{background:#c8ffaa;}
+    #d2{background:#ffc8e0;}
+    #d3{background:#ffffa0;}
+    #d4{background:#a0ffff;}
+    #d5{background:#646464;}
+    #d0{background:#c8a0ff;}
+    #d1:hover{background:#b8ef9a;}
+    #d2:hover{background:#efb8d0;}
+    #d3:hover{background:#efef90;}
+    #d4:hover{background:#90efef;}
+    #d5:hover{background:#545454;}
+    #d0:hover{background:#b890ef;}
+    #d1:active,
+    #d2:active,
+    #d3:active,
+    #d4:active,
+    #d5:active,
+    #d0:active{
+      -webkit-transform:translateY(2px);
+      transform:translateY(2px);
+      box-shadow:0px 0px 1px rgba(0,0,0,0.2);
+      border-bottom:none;
+    }
+
+    #exit{
+      position:fixed;
+      bottom:4%;
+      left:40%;
+      width:120px;
+      height:40px;
+      background:#ff6464;
+    }
+
+  </style>
+
   <style>
 
     .area_status{
@@ -194,7 +254,6 @@
       top:50%;
       text-align:center;
     }
-
     .log_table{
       position:relative;
       width: calc(70vw);
@@ -203,15 +262,15 @@
       align:center;
       text-align:center;
       background-color:rgba(255,255,255,0.5);
-
     }
-
     #master{
       position:fixed;
-      top:80%;
+      top:75%;
       right:20%;
+      background:#ffc864;
+      width:90px;
+      height:40px;
     }
-
 
     .hidden{display:none;}
 
@@ -233,7 +292,6 @@
         else{ret=" "+num;}
       return ret;
     }
-
     function showClock(){
       var nowTime=new Date();
       var nowHour=set2fig(nowTime.getHours());
@@ -287,7 +345,6 @@
       div.appendChild(p);
       document.getElementsByTagName('body')[0].appendChild(div);
     }
-
     //ここからアラート
     function showAlert(title,txt,popup="hidden",fn=function(){}){
       //タイトル、本文、(デフォルト=10秒閉じ,noClose=自動で閉じないアラート,その他＝confirm),関数ー＞""で囲む,Okayに渡される
@@ -338,7 +395,6 @@
     }
     html {touch-action: manipulation;}
     body{background-color:rgba(255,170,0,1);}
-    /*body{background-image:url("img/back.jpg");background-size:cover;}*/
     body{color:#000; font-family:"Gulim",sans-serif; font-weight:700; font-size:125%;}
     body{text-shadow:1px 1px 0 #fff,-1px 1px 0 #fff,1px -1px 0 #fff,-1px -1px 0 #fff;}
     /*body{text-align:center;}*/
@@ -349,6 +405,19 @@
       top:5%;
       left:40px;
       z-index:5;
+    }
+
+    .mybutton{
+      display:inline-block;
+      text-decoration:none;
+      border-bottom:solid 4px #627295;
+      color:#000;
+      font-weight:600;
+      text-align:center;
+      vertical-align:middle;
+      text-shadow:1px 1px 0 #fff,-1px 1px 0 #fff,1px -1px 0 #fff,-1px -1px 0 #fff;
+      border-radius:5px;
+      padding:1px;
     }
 
     /*ここからアラートとバナーのcss*/
@@ -450,7 +519,6 @@
         100%{display:block;padding-top: 20px;padding-bottom :20px;height:auto;}
       }
       /*ここまでアラート*/
-
 
   </style>
 
