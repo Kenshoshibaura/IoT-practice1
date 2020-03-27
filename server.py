@@ -5,17 +5,14 @@ app = Flask(__name__)
 file_sensor = "./sensor_data.csv"
 file_key = "./key_data.csv"
 file_result = "./result_data.csv"
+file_log = "./log_data.csv"
 
 port_num = 17086
 
 #残りserverで実装すること
 
-#利用時間外の設定
 #時間変動による閾値の更新
-#センサーからの情報を情量も受け取るverに変更
-#リロード時の履歴追加
-#更新時刻を正しく設定
-
+#センサーからの情報を重量も受け取るverに変更
 
 #閾値・測定値の初期設定
 Threshold_Key = 10
@@ -23,38 +20,54 @@ Threshold_Light = 10
 Now_Key = 0
 Now_Light = 0
 
+#利用可能時間の設定
+Start_Time = 204
+Limit_Time = 2200
+
+#桁揃え(0埋め)
+def set2fig(x):
+    if x > 9:
+        return x
+    else:
+        return str(0)+str(x)
+
 #現在時刻を取得する関数
 def reload_time():
     date=datetime.datetime.now()
     now_time=str(date.month)+"月"+str(date.day)+"日 "+str(date.hour)+"時"+str(date.minute)+"分"
     return now_time
 
+#ファイルの中身を調べ、第2項目の値(int)を返す
+def data_from_file(file_path):
+    try:
+        f = open(file_path,'r')
+        for row in f:
+            lux = row
+        data = lux.split(',')
+        Now = int(data[1])
+    except Exception as e:
+        print("FILE OPEN ERROR")
+        Now = 0
+    finally:
+        f.close()
+        return Now
+
+#利用可能時間かどうかを調べる
 def Check_Usable():
     #利用時間外の場合には0を返すようにする
-    return 1
+    date=datetime.datetime.now()
+    Now_Minute = set2fig(date.minute)
+    Now_Time = int(str(date.hour)+str(Now_Minute))
+    if (Now_Time >= Start_Time) and (Now_Time < Limit_Time):
+        return 1
+    else:
+        return 0
 
+#手動更新の際閾値を更新する(再起動するとリセットされるので注意)
 def Update_Threshold(situation):
-    #print(situation)
-    try:
-        f = open(file_sensor,'r')
-        for row in f:
-            lux = row
-        data = lux.split(',')
-        Now_Light=int(data[1])
-    except Exception as e:
-        print("FILE OPEN ERROR")
-    finally:
-        f.close()
-    try:
-        f = open(file_key,'r')
-        for row in f:
-            lux = row
-        data = lux.split(',')
-        Now_Key=int(data[1])
-    except Exception as e:
-        print("FILE OPEN ERROR")
-    finally:
-        f.close()
+
+    Now_Light = data_from_file(file_sensor)
+    Now_Key = data_from_file(file_key)
 
     if situation == "1":
         New_Light = Now_Light - 50
@@ -77,28 +90,12 @@ def Update_Threshold(situation):
     Threshold_Light = New_Light
     Threshold_Key = New_Key
 
+#状態を更新
 def Update_Judge():
 
-    try:
-        f = open(file_sensor,'r')
-        for row in f:
-            lux = row
-        data = lux.split(',')
-        Now_Light=int(data[1])
-    except Exception as e:
-        print("FILE OPEN ERROR")
-    finally:
-        f.close()
-    try:
-        f = open(file_key,'r')
-        for row in f:
-            lux = row
-        data = lux.split(',')
-        Now_Key=int(data[1])
-    except Exception as e:
-        print("FILE OPEN ERROR")
-    finally:
-        f.close()
+    Now_Light = data_from_file(file_sensor)
+    Now_Key = data_from_file(file_key)
+    Now_Result = data_from_file(file_result)
 
     if Now_Key >= Threshold_Key:#解錠中
         if Now_Light >= Threshold_Light:#照明on
@@ -113,11 +110,12 @@ def Update_Judge():
                 Result = 2
             else:
                 Result = 5
-    #print(Result)
-    now_time = reload_time()
-    f = open(file_result,'w')
-    f.write(now_time+","+str(Result))
-    f.close()
+
+    if Now_Result != Result:
+        now_time = reload_time()
+        f = open(file_result,'w')
+        f.write(now_time+","+str(Result))
+        f.close()
 
 #初期接続
 @app.route('/', methods=['GET'])
@@ -134,10 +132,14 @@ def update_lux():
     #現在は照度センサの値の更新のみだが、鍵の情報更新もここに追加
     time=request.form["time"]
     lux=request.form["lux"]
+    key = "100"
     now_time = reload_time()
     try:
         f = open(file_sensor,'w')
         f.write(now_time + "," + lux)
+        f.close()
+        f = open(file_key,'w')
+        f.write(now_time + "," + key)
         return "succeeded to write"
     except Exception as e:
         print(e)
@@ -161,10 +163,49 @@ def get_lux():
         f.close()
         return lux
 
+#初期接続時にログデータを送信
+@app.route('/getlog',methods=['GET'])
+def send_log():
+    lux = "0,0"
+    try:
+        f = open(file_log,'r')
+        lux = f.read()
+    except Exception as e:
+        print("FILE OPEN ERROR")
+        lux = "0,0"
+    finally:
+        f.close()
+        return lux
+
 #手動入力用 強制的に閾値を更新することで状態を更新してる
 @app.route('/demo/<situation>',methods=['GET'])
 def get_situation_demo(situation):
     Update_Threshold(situation)
+    return "0,0"
+
+#ログ受信用 4つ以上になった場合最新の4つ以外は削除する
+@app.route('/log/<logtext>',methods=['GET'])
+def get_log(logtext):
+    f = open(file_log,'a')
+    f.write(logtext+",")
+    f.close()
+
+    f = open(file_log,'r')
+    logtext = f.read()
+    data = logtext.split(',')
+    quantity = len(data)
+    f.close()
+    if quantity > 4:
+        f = open(file_log,'w')
+        f.write(data[quantity-5]+","+data[quantity-4]+","+data[quantity-3]+","+data[quantity-2]+",")
+        f.close()
+
+    return "0,0"
+
+#退室勧告用 コンソールにコメントを出すだけ
+@app.route('/alert/<situation>',methods=['GET'])
+def start_alert(situation):
+    print("退室時刻です")
     return "0,0"
 
 if __name__ == '__main__':
