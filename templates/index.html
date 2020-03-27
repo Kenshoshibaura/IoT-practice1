@@ -1,7 +1,8 @@
 <!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
 <!---<link rel="apple-touch-icon" href="img/accept.PNG" />-->
 <script type="text/javascript" src="ken.js"></script>
-<link rel="stylesheet" href="ken.css" type="text/css">
+<link rel="stylesheet" href="static/ken.css" type="text/css">
+<link rel="stylesheet" href="static/eigenvalue.css" type="text/css">
 <html><head><title>テストアプリ</title></head>
   <body onLoad="updateLux('/lux','data')">
     <span id="Realtime" class="time">00/00(0) 00:00:00</span>
@@ -18,15 +19,7 @@
     <span class="area_table">
       --操作履歴--<br>
       <table class="log_table" id="log_table" border="1">
-        <tbody><tr>
-          <td>0</td>
-        </tr><tr>
-          <td>1</td>
-        </tr><tr>
-          <td>2</td>
-        </tr><tr>
-          <td>3</td>
-        </tr></tbody>
+        <tr><td>0</td></tr><tr><td>1</td></tr><tr><td>2</td></tr><tr><td>3</td></tr>
       </table>
     </span>
 
@@ -48,8 +41,6 @@
 
     var Before_Status=0;
     setInterval("Check()",5000);
-    setInterval('showClock()',1000);
-
 
     function Check(){
       updateLux('/lux','data');
@@ -122,7 +113,6 @@
         cell.innerHTML=time+" 施錠";
       }
       table.deleteRow(row_len);
-
     }
 
     function make_time(){
@@ -147,9 +137,6 @@
       target.innerHTML = `${sensorData}`
     }
 
-  </script>
-
-  <script>
     //デモ用
     const demo_order = async(url,element) => {
       var url2 = String(url) + "/" + String(element);
@@ -160,37 +147,12 @@
     }
   </script>
   <style>
+
+
     #demo{
       position:fixed;
       bottom:12%;
       left:10%;
-    }
-    .demobutton{
-      width:60px;
-      height:40px;
-    }
-    #d1{background:#c8ffaa;}
-    #d2{background:#ffc8e0;}
-    #d3{background:#ffffa0;}
-    #d4{background:#a0ffff;}
-    #d5{background:#646464;}
-    #d0{background:#c8a0ff;}
-    #d1:hover{background:#b8ef9a;}
-    #d2:hover{background:#efb8d0;}
-    #d3:hover{background:#efef90;}
-    #d4:hover{background:#90efef;}
-    #d5:hover{background:#545454;}
-    #d0:hover{background:#b890ef;}
-    #d1:active,
-    #d2:active,
-    #d3:active,
-    #d4:active,
-    #d5:active,
-    #d0:active{
-      -webkit-transform:translateY(2px);
-      transform:translateY(2px);
-      box-shadow:0px 0px 1px rgba(0,0,0,0.2);
-      border-bottom:none;
     }
 
     #exit{
@@ -201,10 +163,6 @@
       height:40px;
       background:#ff6464;
     }
-
-  </style>
-
-  <style>
 
     .area_status{
       position:fixed;
@@ -242,257 +200,5 @@
       height:40px;
     }
 
-    .hidden{display:none;}
-
   </style>
-  <style>
-    *{
-      -webkit-tap-highlight-color:rgba(0,0,0,0);
-      -webkit-touch-callout:none;
-      -webkit-user-select:none;
-    }
-    html {touch-action: manipulation;}
-    body{background-color:rgba(255,170,0,1);}
-    body{color:#000; font-family:"Gulim",sans-serif; font-weight:700; font-size:125%;}
-    body{text-shadow:1px 1px 0 #fff,-1px 1px 0 #fff,1px -1px 0 #fff,-1px -1px 0 #fff;}
-    /*body{text-align:center;}*/
-
-    .time{
-      position:fixed;
-      font-size:100%;
-      top:5%;
-      left:40px;
-      z-index:5;
-    }
-
-    .mybutton{
-      display:inline-block;
-      text-decoration:none;
-      border-bottom:solid 4px #627295;
-      color:#000;
-      font-weight:600;
-      text-align:center;
-      vertical-align:middle;
-      text-shadow:1px 1px 0 #fff,-1px 1px 0 #fff,1px -1px 0 #fff,-1px -1px 0 #fff;
-      border-radius:5px;
-      padding:1px;
-    }
-
-
-  </style>
-  <script>
-
-    function set2fig(num){
-      var ret;
-      if(num<10){ret="0"+num;}
-        else{ret=num;}
-      return ret;
-    }
-    function set3fig(num){
-      var ret;
-      if(num<10){ret=" 00"+num;}
-       else if(num<100){ret=" 0"+num;}
-        else{ret=" "+num;}
-      return ret;
-    }
-    function showClock(){
-      var nowTime=new Date();
-      var nowHour=set2fig(nowTime.getHours());
-      var nowMin=set2fig(nowTime.getMinutes());
-      var nowSec=set2fig(nowTime.getSeconds());
-      var nowMonth=set2fig(nowTime.getMonth()+1);
-      var nowDate=set2fig(nowTime.getDate());
-      var wDay=nowTime.getDay();
-      var Day=['日','月','火','水','木','金','土'];
-      var Realtime=nowMonth+"/"+nowDate+"("+Day[wDay]+")"+" "+nowHour+":"+nowMin+":"+nowSec;
-      document.getElementById("Realtime").innerHTML=Realtime;
-    }
-
-    //ここからバナーとアラート・ポップアップ
-    /*
-    -----使い方----
-    banner(title,text [,detail]);
-      >>バナーを使う（バナーは10秒で自動的に消える）
-        title(String) :バナーのタイトル
-        text(String)  :バナーの内容、タグの使用可能
-        detail(String):省略可、バナータッチ時に表示するポップアップの本文、タグの使用可能.
-
-        Ex.)　banner("test","これはテスト","これはテストです。");
-
-    showAlert(title,txt[,popup[,fn]])
-      >>ポップアップを使う。Okを押さなくても100秒後に閉じる
-      title(String) :ポップアップのタイトル
-      txt(String)   :バナーの内容、タグの使用可能
-      popup(String) :省略可、デフォルトはhidden.
-
-        -hidden  デフォルト値. 100秒で自動的に閉じるアラート。OKボタンのみある。fnを実行する。
-        -noClose 自動的には閉じないアラート。OKボタンのみある。fnを実行する。
-        -その他   自動的に閉じないコンファーム。キャンセルを押すと何もしない、OKを押すとfnを実行する
-
-      fn(String)    :省略可。関数名もしくは function(){} を直接記述。OKを押した後に実行される。' or " で囲む必要あり。
-
-      Ex.)　showAlert('テストです','このコンファームはテストです。','confirm','banner("やったー","コンファームが無事使えたよ！")');
-            showAlert('テスト','自動的に消えます。');
-
-    */
-    //ここからバナー
-    function banner(title,text,detail = text){
-      var div = document.createElement('div');
-      div.className = "banner";
-      div.setAttribute("onclick","this.style.animation='animation-banner-up 0.5s';showAlert('"+title+"','"+detail+"','noClose')");
-      var h1 = document.createElement('h2');
-      h1.innerHTML = title;
-      var p = document.createElement('p');
-      p.innerHTML = text;
-      div.appendChild(h1);
-      div.appendChild(p);
-      document.getElementsByTagName('body')[0].appendChild(div);
-    }
-    //ここからアラート
-    function showAlert(title,txt,popup="hidden",fn=function(){}){
-      //タイトル、本文、(デフォルト=10秒閉じ,noClose=自動で閉じないアラート,その他＝confirm),関数ー＞""で囲む,Okayに渡される
-      var div1 = document.createElement('div');
-      div1.className = "bgAlert";
-      var div2 = document.createElement('div');
-      div2.className = "alert";
-      var h2 = document.createElement('h2');
-      h2.innerHTML = title;
-      var p = document.createElement('p');
-      p.innerHTML = txt;
-      var time = document.createElement('div');
-      time.innerHTML = "Auto Close : 100 sec.";
-      var cancel = document.createElement('button');
-      cancel.innerHTML = "いいえ";
-      cancel.setAttribute("onclick","hideConfirm(this);");
-      if(popup==("hidden"))cancel.style.visibility="hidden";
-      if(popup==("noClose"))cancel.style.visibility="hidden";
-      var okay = document.createElement('button');
-      okay.style.background = "#5566FF";
-      //
-      okay.setAttribute("onclick","hideConfirm(this,"+fn+");");
-      okay.innerHTML  = "はい";
-      div2.appendChild(h2);
-      div2.appendChild(p);
-      div2.appendChild(cancel);
-      div2.appendChild(okay);
-      div1.appendChild(div2);
-      document.getElementsByTagName('body')[0].appendChild(div1);
-      console.log();
-      if(popup=="hidden"){
-        div2.appendChild(time);
-        console.log(time.innerHTML.replace(/[^0-9]/g,""));
-        var timeout = setInterval(function(time){time.innerHTML = "Auto Close : "+(parseInt(time.innerHTML.replace(/[^0-9]/g,""))-1)+" sec.";},1000,time);
-        setTimeout(function(div1,timeout){clearInterval(timeout);console.log(div1);div1.remove(div1);},101000,div1,timeout);
-      }
-    }
-    function hideConfirm(obj,fc=function(){}){
-      obj.parentNode.parentNode.style.display='none';
-      fc();
-    }
-
-  </script>
-  <style>
-
-    /*ここからアラートとバナーのcss*/
-    /*ここからバナー*/
-    .banner{
-      position : fixed;
-      top : -700px;
-      left : 25vw;
-      width: 50vw;
-      background: rgba(55,55,55,0.9);
-      text-shadow:none;
-      color:white;
-      text-align:center;
-      z-index:29;
-      border-radius : 20px;
-      border : solid 3px white;
-      animation: animation-banner 5s;
-    }
-    .banner p{
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    @keyframes animation-banner {
-      0%{top:-700px;display:block;}
-      6%{top:20px;}
-      9%{top:0px;}
-      13%{top:12px;}
-      19%{top:5px;}
-      90%{top:5px;}
-      92%{top:7px;}
-      100%{top:-700px;}
-    }
-    @keyframes animation-banner-up {
-      0%{top:0px;}
-      100%{top:-700px;}
-    }
-
-    /*ここからアラート*/
-      .bgAlert{
-        position:fixed;
-        top:0px;
-        right:0px;
-        width:100%;
-        height:100%;
-        background: rgba(0,0,0,0.5);
-        animation:animation-background 0.3s;
-        z-index:29;
-      }
-      .alert{
-        background:rgba(55,55,55,0.9);
-        border-radius:30px;
-        color: white;
-        padding: 20px;
-        position :fixed;
-        top: 50%;
-        left:50%;
-        transform:translate(-50%,-50%);
-        text-shadow: none;
-        text-align: center;
-        overflow: hidden;
-        border: solid 3px white;
-        animation: animation-popup 0.3s;
-      }
-      .alert p{
-        font-size:120%;
-      }
-      .alert button{
-        color: white;
-        background: rgba(200,200,200,0.5);
-        width:calc(50% - 10px);
-        border-radius: 30px;
-        margin: 5px 5px;
-        outline-color: white;
-        padding:10px;
-        border: 2px solid white;
-      }
-      .alert button:active {
-        border-color: #AAA;
-        color:#AAA;
-        background: rgba(0,0,0,0.7);
-      }
-      .alert div{
-        font-size:70%;
-        text-align: right;
-      }
-
-      @keyframes animation-background{
-        0%{display:  none; background: rgba(0,0,0,0);}
-        1%{display:  block;background: rgba(0,0,0,0);}
-        100%{display:block;background: rgba(0,0,0,0.5);}
-      }
-      @keyframes animation-popup{
-        0%{display:none  ;padding-top: 0px;padding-bottom :0px;height:0px;}
-        20%{display:block;padding : 0px;height:0px;}
-        25%{display:block;padding : 0px 60px;height:0px;}
-        40%{display:block;padding : 10px 20px;height:0px;}
-        90%{display:block;padding-top: 25px;padding-bottom :25px;height:auto;}
-        100%{display:block;padding-top: 20px;padding-bottom :20px;height:auto;}
-      }
-      /*ここまでアラート*/
-
-  </style>
-
 </html>

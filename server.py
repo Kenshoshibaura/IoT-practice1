@@ -19,6 +19,11 @@ def reload_time():
 def get_html():
     return render_template('./index.html')
 
+#css,jsファイル読み込み
+@app.route('/<files>', methods=['GET'])
+def get_files(files):
+    return render_template('./'+files)
+
 #センサからのデータを受信、データを更新
 @app.route('/lux', methods=['POST'])
 def update_lux():
