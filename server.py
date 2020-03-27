@@ -10,9 +10,15 @@ file_log = "./log_data.csv"
 port_num = 17086
 
 #残りserverで実装すること
+#各閾値の調整
 
-#時間変動による閾値の更新
-#センサーからの情報を重量も受け取るverに変更
+#html
+#オペレーターコマンドの認証実装
+#退出時間の警告発動
+
+#全体
+#値調整
+#センサ接続・調整
 
 #閾値・測定値の初期設定
 Threshold_Key = 10
@@ -23,6 +29,9 @@ Now_Light = 0
 #利用可能時間の設定
 Start_Time = 204
 Limit_Time = 2200
+
+#閾値の周期変更値(辞書)
+Cycle_Time = {'500':'40', '800':'65', '1300':'80', '1700':'70', '1800':'55', '2100':'30'}
 
 #桁揃え(0埋め)
 def set2fig(x):
@@ -62,6 +71,15 @@ def Check_Usable():
         return 1
     else:
         return 0
+
+#特定の時間になると閾値を変更する
+def Cycle_Threshold():
+    date=datetime.datetime.now()
+    Now_Minute = set2fig(date.minute)
+    Now_Time = int(str(date.hour)+str(Now_Minute))
+    if (str(Now_Time) in Cycle_Time) is True:
+        global Threshold_Light
+        Threshold_Light = int(Cycle_Time[str(Now_Time)])
 
 #手動更新の際閾値を更新する(再起動するとリセットされるので注意)
 def Update_Threshold(situation):
@@ -132,7 +150,7 @@ def update_lux():
     #現在は照度センサの値の更新のみだが、鍵の情報更新もここに追加
     time=request.form["time"]
     lux=request.form["lux"]
-    key = "100"
+    key=request.form["key"]
     now_time = reload_time()
     try:
         f = open(file_sensor,'w')
@@ -152,6 +170,7 @@ def update_lux():
 def get_lux():
     lux = "0,0"
     Update_Judge()
+    Cycle_Threshold()
     try:
         f = open(file_result,'r')
         for row in f:
