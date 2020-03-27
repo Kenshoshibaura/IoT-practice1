@@ -8,17 +8,121 @@ file_result = "./result_data.csv"
 
 port_num = 17086
 
+#残りserverで実装すること
+
+#利用時間外の設定
+#時間変動による閾値の更新
+#センサーからの情報を情量も受け取るverに変更
+#リロード時の履歴追加
+#更新時刻を正しく設定
+
+
+#閾値・測定値の初期設定
+Threshold_Key = 10
+Threshold_Light = 10
+Now_Key = 0
+Now_Light = 0
+
 #現在時刻を取得する関数
 def reload_time():
     date=datetime.datetime.now()
     now_time=str(date.month)+"月"+str(date.day)+"日 "+str(date.hour)+"時"+str(date.minute)+"分"
     return now_time
 
+def Check_Usable():
+    #利用時間外の場合には0を返すようにする
+    return 1
+
+def Update_Threshold(situation):
+    #print(situation)
+    try:
+        f = open(file_sensor,'r')
+        for row in f:
+            lux = row
+        data = lux.split(',')
+        Now_Light=int(data[1])
+    except Exception as e:
+        print("FILE OPEN ERROR")
+    finally:
+        f.close()
+    try:
+        f = open(file_key,'r')
+        for row in f:
+            lux = row
+        data = lux.split(',')
+        Now_Key=int(data[1])
+    except Exception as e:
+        print("FILE OPEN ERROR")
+    finally:
+        f.close()
+
+    if situation == "1":
+        New_Light = Now_Light - 50
+        New_Key = Now_Key - 50
+    elif situation == "2":
+        New_Light = Now_Light + 50
+        New_Key = Now_Key + 50
+    elif situation == "3":
+        New_Light = Now_Light - 10
+        New_Key = Now_Key + 50
+    elif situation == "4":
+        New_Light = Now_Light + 50
+        New_Key = Now_Key - 50
+    elif situation == "5":
+        New_Light = Now_Light + 50
+        New_Key = Now_Key + 50
+
+    global Threshold_Light
+    global Threshold_Key
+    Threshold_Light = New_Light
+    Threshold_Key = New_Key
+
+def Update_Judge():
+
+    try:
+        f = open(file_sensor,'r')
+        for row in f:
+            lux = row
+        data = lux.split(',')
+        Now_Light=int(data[1])
+    except Exception as e:
+        print("FILE OPEN ERROR")
+    finally:
+        f.close()
+    try:
+        f = open(file_key,'r')
+        for row in f:
+            lux = row
+        data = lux.split(',')
+        Now_Key=int(data[1])
+    except Exception as e:
+        print("FILE OPEN ERROR")
+    finally:
+        f.close()
+
+    if Now_Key >= Threshold_Key:#解錠中
+        if Now_Light >= Threshold_Light:#照明on
+            Result = 1
+        else:
+            Result = 4
+    else:#施錠中
+        if Now_Light >= Threshold_Light:
+            Result = 3
+        else:
+            if (Check_Usable()==1):
+                Result = 2
+            else:
+                Result = 5
+    #print(Result)
+    now_time = reload_time()
+    f = open(file_result,'w')
+    f.write(now_time+","+str(Result))
+    f.close()
+
 #初期接続
 @app.route('/', methods=['GET'])
 def get_html():
     return render_template('./index.html')
-
 #css,jsファイル読み込み
 @app.route('/<files>', methods=['GET'])
 def get_files(files):
@@ -45,53 +149,22 @@ def update_lux():
 @app.route('/lux',methods=['GET'])
 def get_lux():
     lux = "0,0"
+    Update_Judge()
     try:
         f = open(file_result,'r')
         for row in f:
             lux = row
     except Exception as e:
-        #print(e)
         print("FILE OPEN ERROR")
         lux = "0,0"
     finally:
         f.close()
         return lux
 
-#デモ入力用 強制的に各ファイルを書き換えてる result以外は閾値を更新する関数を作って呼び出す必要あり
+#手動入力用 強制的に閾値を更新することで状態を更新してる
 @app.route('/demo/<situation>',methods=['GET'])
 def get_situation_demo(situation):
-    now_time = reload_time()
-    if situation == "1":
-        lite = "100"
-        key = "0"
-    elif situation == "2":
-        lite = "0"
-        key = "1"
-    elif situation == "3":
-        lite = "100"
-        key = "1"
-    elif situation == "4":
-        lite = "0"
-        key = "0"
-    elif situation == "5":
-        lite = "0"
-        key = "1"
-    else:
-        lite = "0"
-        key = "1"
-
-    f = open(file_result,'w')
-    f.write(now_time+","+situation)
-    f.close()
-
-    #今はここで直接書き換えてる
-    f = open(file_sensor,'w')
-    f.write(now_time+","+lite)
-    f.close()
-    f = open(file_key,'w')
-    f.write(now_time+","+key)
-    f.close()
-
+    Update_Threshold(situation)
     return "0,0"
 
 if __name__ == '__main__':

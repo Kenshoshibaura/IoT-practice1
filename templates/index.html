@@ -25,7 +25,7 @@
 
     <button id="master" class="mybutton" onclick="OperatorCommand()">管理者コマンド</button>
     <span id="demo" class="hidden">
-      <button id="d0" class="mybutton demobutton" onclick="demo_order('/demo','0')">0<br>不明</button>
+      <!---<button id="d0" class="mybutton demobutton" onclick="demo_order('/demo','0')">0<br>不明</button>-->
       <button id="d1" class="mybutton demobutton" onclick="demo_order('/demo','1')">1<br>在室</button>
       <button id="d2" class="mybutton demobutton" onclick="demo_order('/demo','2')">2<br>施錠</button>
       <button id="d3" class="mybutton demobutton" onclick="demo_order('/demo','3')">3<br>照明</button>
@@ -69,7 +69,7 @@
         }else if(Now_status==3){
           document.body.style.backgroundColor = "#ffffa0";
           message.innerHTML="電気が点けっ放しです";
-          showAlert('警告','電気は消しましたか？','confirm','Manual_Lock()');
+          showAlert('警告','電気は消しましたか？','confirm',"demo_order('/demo','2')");
         }else if(Now_status==4){
           document.body.style.backgroundColor = "#a0ffff";
           message.innerHTML="現在席を外しています";
@@ -152,7 +152,7 @@
     #demo{
       position:fixed;
       bottom:12%;
-      left:10%;
+      left:20%;
     }
 
     #exit{

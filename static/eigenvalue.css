@@ -7,19 +7,19 @@
 #d3{background:#ffffa0;}
 #d4{background:#a0ffff;}
 #d5{background:#646464;}
-#d0{background:#c8a0ff;}
+/*#d0{background:#c8a0ff;}*/
 #d1:hover{background:#b8ef9a;}
 #d2:hover{background:#efb8d0;}
 #d3:hover{background:#efef90;}
 #d4:hover{background:#90efef;}
 #d5:hover{background:#545454;}
-#d0:hover{background:#b890ef;}
+/*#d0:hover{background:#b890ef;}*/
 #d1:active,
 #d2:active,
 #d3:active,
 #d4:active,
-#d5:active,
-#d0:active{
+#d5:active/*,
+#d0:active*/{
   -webkit-transform:translateY(2px);
   transform:translateY(2px);
   box-shadow:0px 0px 1px rgba(0,0,0,0.2);
