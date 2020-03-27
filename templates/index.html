@@ -48,6 +48,8 @@
 
     var Before_Status=0;
     setInterval("Check()",5000);
+    setInterval('showClock()',1000);
+
 
     function Check(){
       updateLux('/lux','data');
@@ -92,30 +94,6 @@
         }
         Before_Status = Now_status;
       }
-    }
-    function Manual_Lock(){
-      var message=document.getElementById('Status');
-      document.body.style.backgroundColor = "#ffc8e0";
-      message.innerHTML="鍵を閉めました";
-      banner("施錠","施錠しました");
-      Before_Status = 2;
-      manuallock('/lux','2');
-      var data=document.getElementById('data');
-      data.innerHTML="0,2";
-      rewrite_log(2,1);
-
-    }
-    function Manual_Unlock(){
-      var message=document.getElementById('Status');
-      document.body.style.backgroundColor = "#c8ffaa";
-      message.innerHTML="鍵を開けました";
-      banner("解錠","解錠しました");
-      Before_Status = 1;
-      manuallock('/lux','1');
-      var data=document.getElementById('data');
-      data.innerHTML="0,1";
-      rewrite_log(1,1);
-
     }
 
     function rewrite_log(s,t){
@@ -168,14 +146,6 @@
       const target = document.getElementById(element)
       target.innerHTML = `${sensorData}`
     }
-
-    /*const manuallock = async(url,element) => {
-      var url2 = String(url) + "/" + String(element);
-      const return_from_server = await fetch(url2)
-      .then(response => response.text())
-      var response2 = `${return_from_server}`
-      console.log(response2);
-    }*/
 
   </script>
 
@@ -275,10 +245,43 @@
     .hidden{display:none;}
 
   </style>
+  <style>
+    *{
+      -webkit-tap-highlight-color:rgba(0,0,0,0);
+      -webkit-touch-callout:none;
+      -webkit-user-select:none;
+    }
+    html {touch-action: manipulation;}
+    body{background-color:rgba(255,170,0,1);}
+    body{color:#000; font-family:"Gulim",sans-serif; font-weight:700; font-size:125%;}
+    body{text-shadow:1px 1px 0 #fff,-1px 1px 0 #fff,1px -1px 0 #fff,-1px -1px 0 #fff;}
+    /*body{text-align:center;}*/
 
+    .time{
+      position:fixed;
+      font-size:100%;
+      top:5%;
+      left:40px;
+      z-index:5;
+    }
+
+    .mybutton{
+      display:inline-block;
+      text-decoration:none;
+      border-bottom:solid 4px #627295;
+      color:#000;
+      font-weight:600;
+      text-align:center;
+      vertical-align:middle;
+      text-shadow:1px 1px 0 #fff,-1px 1px 0 #fff,1px -1px 0 #fff,-1px -1px 0 #fff;
+      border-radius:5px;
+      padding:1px;
+    }
+
+
+  </style>
   <script>
-    /*ここからは編集不可*/
-    setInterval('showClock()',1000);
+
     function set2fig(num){
       var ret;
       if(num<10){ret="0"+num;}
@@ -386,39 +389,9 @@
       obj.parentNode.parentNode.style.display='none';
       fc();
     }
+
   </script>
   <style>
-    *{
-      -webkit-tap-highlight-color:rgba(0,0,0,0);
-      -webkit-touch-callout:none;
-      -webkit-user-select:none;
-    }
-    html {touch-action: manipulation;}
-    body{background-color:rgba(255,170,0,1);}
-    body{color:#000; font-family:"Gulim",sans-serif; font-weight:700; font-size:125%;}
-    body{text-shadow:1px 1px 0 #fff,-1px 1px 0 #fff,1px -1px 0 #fff,-1px -1px 0 #fff;}
-    /*body{text-align:center;}*/
-
-    .time{
-      position:fixed;
-      font-size:100%;
-      top:5%;
-      left:40px;
-      z-index:5;
-    }
-
-    .mybutton{
-      display:inline-block;
-      text-decoration:none;
-      border-bottom:solid 4px #627295;
-      color:#000;
-      font-weight:600;
-      text-align:center;
-      vertical-align:middle;
-      text-shadow:1px 1px 0 #fff,-1px 1px 0 #fff,1px -1px 0 #fff,-1px -1px 0 #fff;
-      border-radius:5px;
-      padding:1px;
-    }
 
     /*ここからアラートとバナーのcss*/
     /*ここからバナー*/
