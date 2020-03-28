@@ -9,9 +9,9 @@
     <span id="log" class="hidden">0,0,0,0</span><br>
     <span class="area_status">
       〜現在の研究室の状況〜<br>
-      <span id="Status">データ受信中</span><br><br><br>
+      <span id="Status">データ受信中</span><br><br>
       〜<span id="Operation">操作</span>時刻〜<br>
-      <span id="LockTime">データ受信中</span><br><br><br>
+      <span id="LockTime">データ受信中</span><br><br>
       〜操作履歴〜<br>
       <table class="log_table" id="log_table" border="1">
         <tr><td>0</td></tr><tr><td>1</td></tr><tr><td>2</td></tr><tr><td>3</td></tr>
@@ -19,10 +19,10 @@
     </span>
     <button class="master mybutton masterbutton" onclick="OperatorCommand()">管理者コマンド</button>
     <span id="demo" class="hidden">
-      <button id="d1" class="mybutton demobutton" onclick="Submit('/demo','1')">1<br>在室</button>
-      <button id="d2" class="mybutton demobutton" onclick="Submit('/demo','2')">2<br>施錠</button>
-      <button id="d3" class="mybutton demobutton" onclick="Submit('/demo','3')">3<br>照明</button>
-      <button id="d4" class="mybutton demobutton" onclick="Submit('/demo','4')">4<br>不在</button>
+      <button id="d1" class="mybutton demobutton" onclick="Submit('/demo','1')">1 在室</button>
+      <button id="d2" class="mybutton demobutton" onclick="Submit('/demo','2')">2 施錠</button>
+      <button id="d3" class="mybutton demobutton" onclick="Submit('/demo','3')">3 照明</button>
+      <button id="d4" class="mybutton demobutton" onclick="Submit('/demo','4')">4 不在</button>
     </span>
     <span id="exit" class="hidden">
       <button class="exit mybutton masterbutton" onclick="Submit('/alert','1')">退室勧告(未実装)</button>

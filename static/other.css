@@ -71,6 +71,22 @@
     box-shadow:0px 0px 1px rgba(0,0,0,0.2);
     border-bottom:none;
   }
-  @media screen and (max-width:700px){
-    .master{background:#6464ff;}
+
+  @media screen and (max-height:1000px){
+    .area_status{top:12%;}
+    #demo{bottom:14%;}
+    .master{bottom:24%;}
+    .exit{bottom:4%;}
+    .demobutton{height:50px;}
+    .masterbutton{height:50px;}
+
+  }
+  @media screen and (min-height:1000px){
+    body{font-size:180%;}
+    #demo{bottom:20%;}
+    .master{bottom:30%;}
+    .exit{bottom:10%;}
+    .demobutton{height:60px;}
+    .masterbutton{height:60px;}
+
   }
