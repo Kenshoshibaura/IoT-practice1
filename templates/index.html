@@ -27,8 +27,22 @@
     <span id="exit" class="hidden">
       <button class="exit mybutton masterbutton" onclick="Submit('/alert','1')">退室勧告(未実装)</button>
     </span>
+    <span id="winsize"></span>
   </body>
   <script>
+
+    window_load();
+
+    window.onresize = window_load;
+
+    function window_load(){
+      var sW,sH,s;
+      sW = window.innerWidth;
+      sH = window.innerHeight;
+      s = "ウィンドウサイズ:横幅 = " + sW + " / 高さ = " + sH;
+      document.getElementById('winsize').innerHTML = s;
+    }
+
     var Before_Status=0;
     setInterval("Check()",5000);
     function Loading(){
