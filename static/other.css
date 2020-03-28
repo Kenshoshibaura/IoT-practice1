@@ -1,0 +1,73 @@
+
+  .time{
+    position:fixed;
+    top:5%;
+    left:10%;
+  }
+  .area_status{
+    position:fixed;
+    left:15%;
+    top:15%;
+    width: calc(70vw);
+    text-align:center;
+  }
+  .log_table{
+    position:relative;
+    width: calc(70vw);
+    border-collapse: collapse;
+    border-color:rgba(255,255,255,1);
+    align:center;
+    text-align:center;
+    background-color:rgba(255,255,255,0.5);
+  }
+
+  .mybutton{
+    display:inline-block;
+    text-decoration:none;
+    border-bottom:solid 4px #627295;
+    color:#000;
+    font-size:80%;
+    font-weight:700;
+    text-align:center;
+    vertical-align:middle;
+    text-shadow:1px 1px 0 #fff,-1px 1px 0 #fff,1px -1px 0 #fff,-1px -1px 0 #fff;
+    border-radius:5px;
+    padding:1px;
+  }
+  .demobutton{
+    width:calc(15vw);
+    height:45px;
+  }
+  .masterbutton{
+    position:fixed;
+    width:calc(40vw);
+    height:45px;
+    left:30%;
+  }
+  #demo{
+    position:fixed;
+    left:18%;
+    bottom:12%;
+  }
+  .master{bottom:20%;}
+  .exit{bottom:4%;}
+  .master{background:#ffc864;}
+  .exit{background:#ff6464;}
+
+  #d1{background:#c8ffaa;}
+  #d2{background:#ffc8e0;}
+  #d3{background:#ffffa0;}
+  #d4{background:#a0ffff;}
+  #d1:hover{background:#b8ef9a;}
+  #d2:hover{background:#efb8d0;}
+  #d3:hover{background:#efef90;}
+  #d4:hover{background:#90efef;}
+  #d1:active,
+  #d2:active,
+  #d3:active,
+  #d4:active{
+    -webkit-transform:translateY(2px);
+    transform:translateY(2px);
+    box-shadow:0px 0px 1px rgba(0,0,0,0.2);
+    border-bottom:none;
+  }

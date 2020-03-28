@@ -1,94 +1,68 @@
 <!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
-<!---<link rel="apple-touch-icon" href="img/accept.PNG" />-->
 <script type="text/javascript" src="ken.js"></script>
 <link rel="stylesheet" href="static/ken.css" type="text/css">
-<link rel="stylesheet" href="static/eigenvalue.css" type="text/css">
-<html><head><title>テストアプリ</title></head>
-  <body onLoad="loading()">
+<link rel="stylesheet" href="static/other.css" type="text/css">
+<html><head><title>鍵管理アプリ</title></head>
+  <body onLoad="Loading()">
     <span id="Realtime" class="time">00/00(0) 00:00:00</span>
-    <span class="hidden">現在の情報：<span id = "data">2000/04/01 00:00:00,0</span></span><br>
-    <span class="hidden">現在の情報：<span id = "log">2000/04/01 00:00:00,0</span></span><br>
-
+    <span id="data" class="hidden">4月1日 0時0分,0</span><br>
+    <span id="log" class="hidden">0,0,0,0</span><br>
     <span class="area_status">
-      --現在の研究室の状況--<br>
-      <span id="Status">〜データ受信中〜</span><br>
-    </span>
-    <span class="area_log">
-      --<span id="Ope_Judge">操作</span>時刻--<br>
-      <span id="LockTime">〜データ受信中〜</span><br>
-    </span>
-    <span class="area_table">
-      --操作履歴--<br>
+      〜現在の研究室の状況〜<br>
+      <span id="Status">データ受信中</span><br><br><br>
+      〜<span id="Operation">操作</span>時刻〜<br>
+      <span id="LockTime">データ受信中</span><br><br><br>
+      〜操作履歴〜<br>
       <table class="log_table" id="log_table" border="1">
         <tr><td>0</td></tr><tr><td>1</td></tr><tr><td>2</td></tr><tr><td>3</td></tr>
       </table>
     </span>
-
-    <button id="master" class="mybutton" onclick="OperatorCommand()">管理者コマンド</button>
+    <button class="master mybutton masterbutton" onclick="OperatorCommand()">管理者コマンド</button>
     <span id="demo" class="hidden">
-      <!---<button id="d0" class="mybutton demobutton" onclick="demo_order('/demo','0')">0<br>不明</button>-->
-      <button id="d1" class="mybutton demobutton" onclick="submit_data('/demo','1')">1<br>在室</button>
-      <button id="d2" class="mybutton demobutton" onclick="submit_data('/demo','2')">2<br>施錠</button>
-      <button id="d3" class="mybutton demobutton" onclick="submit_data('/demo','3')">3<br>照明</button>
-      <button id="d4" class="mybutton demobutton" onclick="submit_data('/demo','4')">4<br>不在</button>
-      <button id="d5" class="mybutton demobutton" onclick="submit_data('/demo','5')">5<br>不可</button>
+      <button id="d1" class="mybutton demobutton" onclick="Submit('/demo','1')">1<br>在室</button>
+      <button id="d2" class="mybutton demobutton" onclick="Submit('/demo','2')">2<br>施錠</button>
+      <button id="d3" class="mybutton demobutton" onclick="Submit('/demo','3')">3<br>照明</button>
+      <button id="d4" class="mybutton demobutton" onclick="Submit('/demo','4')">4<br>不在</button>
     </span>
-    <span id="command1" class="hidden"><button id="exit" class="mybutton" onclick="submit_data('/alert','1')">退室勧告(未実装)</button></span>
-
+    <span id="exit" class="hidden">
+      <button class="exit mybutton masterbutton" onclick="Submit('/alert','1')">退室勧告(未実装)</button>
+    </span>
   </body>
-
   <script>
-
     var Before_Status=0;
     setInterval("Check()",5000);
-
-    function loading(){
-      updateLux('/getlog','log');
-      updateLux('/lux','data');
+    function Loading(){
+      Receive('/getlog','log');
+      Receive('/lux','data');
     }
-
-    function reload_log(){
+    function InitialLog(){
       var data=document.getElementById('log');
       var table=document.getElementById('log_table');
-      var LockJudge=document.getElementById('Ope_Judge');
-      var Lock=document.getElementById('LockTime');
+      var Operation=document.getElementById('Operation');
+      var LockTime=document.getElementById('LockTime');
 
       var Now_data=data.innerHTML;
       var Now_data2=Now_data.split(',');
-
       var row_len=table.rows.length;
-      var row=table.insertRow(0);
-      var cell=row.insertCell(-1);
-      cell.innerHTML=Now_data2[0];
-      table.deleteRow(row_len);
 
-      var row=table.insertRow(0);
-      var cell=row.insertCell(-1);
-      cell.innerHTML=Now_data2[1];
-      table.deleteRow(row_len);
-
-      var row=table.insertRow(0);
-      var cell=row.insertCell(-1);
-      cell.innerHTML=Now_data2[2];
-      table.deleteRow(row_len);
-
-      var row=table.insertRow(0);
-      var cell=row.insertCell(-1);
-      cell.innerHTML=Now_data2[3];
-      table.deleteRow(row_len);
+      for(var i=0;i<4;i++){
+        var row=table.insertRow(0);
+        var cell=row.insertCell(-1);
+        cell.innerHTML=Now_data2[i];
+        table.deleteRow(row_len);
+      }
 
       var Now_data3=Now_data2[3].split(' ');
-      LockJudge.innerHTML=Now_data3[2];
-      Lock.innerHTML=Now_data3[0]+" "+Now_data3[1];
+      Operation.innerHTML=Now_data3[2];
+      LockTime.innerHTML=Now_data3[0]+" "+Now_data3[1];
     }
-
     var count = 1;
     function Check(){
       if(count==1){
-        reload_log();
+        InitialLog();
         count=0
       }
-      updateLux('/lux','data');
+      Receive('/lux','data');
       var data=document.getElementById('data');
       var Now_data=data.innerHTML;
       var Now_data2=Now_data.split(',');
@@ -97,8 +71,10 @@
       if(Now_status==Before_Status){
         //banner("状態一定","変化なし");
         if((Now_status==1)||(Now_status==4)){
-          //if 退室時間になったら
-          //submit_data('/alert','1');
+          time=MakeTime();
+          if(time=="2200"){
+            Submit('/alert','1');
+          }
         }
       }else{
         var message=document.getElementById('Status');
@@ -107,32 +83,32 @@
           message.innerHTML="鍵は開いています";
           banner("解錠","解錠されました");
           if((Before_Status==2)||(Before_Status==3)||(Before_Status==5)){
-            rewrite_log(1,0);
+            UpdateLog(0);
           }
         }else if(Now_status==2){
           document.body.style.backgroundColor = "#ffc8e0";
           message.innerHTML="鍵は閉まっています";
           banner("施錠","施錠されました");
-          if((Before_Status==1)||(Before_Status==4)){
-            rewrite_log(2,0);
+          if((Before_Status==1)||(Before_Status==3)||(Before_Status==4)){
+            UpdateLog(1);
           }
         }else if(Now_status==3){
           document.body.style.backgroundColor = "#ffffa0";
           message.innerHTML="電気が点けっ放しです";
-          showAlert('警告','電気は消しましたか？','confirm',"submit_data('/demo','2')");
+          showAlert('警告','電気は消しましたか？','confirm',"Submit('/demo','2')");
         }else if(Now_status==4){
           document.body.style.backgroundColor = "#a0ffff";
           message.innerHTML="現在席を外しています";
           banner("無人","現在席を外しています");
           if((Before_Status==2)||(Before_Status==3)||(Before_Status==5)){
-            rewrite_log(1,0);
+            UpdateLog(0);
           }
         }else if(Now_status==5){
           document.body.style.backgroundColor = "#646464";
           message.innerHTML="利用時間外です";
           banner("利用時間外","現在は利用時間外です");
           if((Before_Status==1)||(Before_Status==4)){
-            rewrite_log(2,0);
+            UpdateLog(1);
           }
         }else{
           document.body.style.backgroundColor = "#c8a0ff";
@@ -142,123 +118,49 @@
         Before_Status = Now_status;
       }
     }
-
-    function rewrite_log(s,t){
-      var LockJudge=document.getElementById('Ope_Judge');
-      var Lock=document.getElementById('LockTime');
-      if(t==0){
-        var data=document.getElementById('data');
-        var Now_data=data.innerHTML;
-        var Now_data2=Now_data.split(',');
-        var time=Now_data2[0];
-      }else{
-        var time=make_time();
-      }
+    function UpdateLog(s){
+      var status = new Array("解錠","施錠");
+      var Operation=document.getElementById('Operation');
+      var LockTime=document.getElementById('LockTime');
       var table=document.getElementById('log_table');
+      var data=document.getElementById('data');
+      var Now_data=data.innerHTML;
+      var Now_data2=Now_data.split(',');
+      var time=Now_data2[0];
       var row_len=table.rows.length;
       var row=table.insertRow(0);
       var cell=row.insertCell(-1);
-
-      if(s==1){
-        LockJudge.innerHTML="解錠";
-        Lock.innerHTML=time;
-        cell.innerHTML=time+" 解錠";
-      }else if(s==2){
-        LockJudge.innerHTML="施錠";
-        Lock.innerHTML=time;
-        cell.innerHTML=time+" 施錠";
-      }
+      LockTime.innerHTML=time;
+      Operation.innerHTML=status[s];
+      cell.innerHTML=time+" "+status[s];
       table.deleteRow(row_len);
-      var log_text = cell.innerHTML;
-      submit_data('/log',log_text);
-
+      var message = cell.innerHTML;
+      Submit('/log',message);
     }
-
-    function make_time(){
+    function MakeTime(){
       var nowTime=new Date();
       var nowHour=nowTime.getHours();
       var nowMin=nowTime.getMinutes();
-      var nowMonth=nowTime.getMonth()+1;
-      var nowDate=nowTime.getDate();
-      var Realtime=nowMonth+"月"+nowDate+"日 "+nowHour+"時"+nowMin+"分";
-      return Realtime;
+      var time=nowHour+set2fig(nowMin);
+      return time;
     }
-
     function OperatorCommand(){
       document.getElementById('demo').style.display="block";
-      document.getElementById('command1').style.display="block";
+      document.getElementById('exit').style.display="block";
     }
 
-    const updateLux = async(url,element) => {
+    const Receive = async(url,element) => {
       const sensorData = await fetch(url)
       .then(response => response.text())
       const target = document.getElementById(element)
       target.innerHTML = `${sensorData}`
     }
-
     //データ送信用(デモ・ログ・アラート)
-    const submit_data = async(url,element) => {
+    const Submit = async(url,element) => {
       var url2 = String(url) + "/" + String(element);
       const return_from_server = await fetch(url2)
       .then(response => response.text())
       var response2 = `${return_from_server}`
-      console.log(response2);
     }
-
   </script>
-  <style>
-
-
-    #demo{
-      position:fixed;
-      bottom:12%;
-      left:20%;
-    }
-
-    #exit{
-      position:fixed;
-      bottom:4%;
-      left:40%;
-      width:120px;
-      height:40px;
-      background:#ff6464;
-    }
-
-    .area_status{
-      position:fixed;
-      left:29%;
-      top:20%;
-      text-align:center;
-    }
-    .area_log{
-      position:fixed;
-      left:34%;
-      top:35%;
-      text-align:center;
-    }
-    .area_table{
-      position:fixed;
-      left:15%;
-      top:50%;
-      text-align:center;
-    }
-    .log_table{
-      position:relative;
-      width: calc(70vw);
-      border-collapse: collapse;
-      border-color:rgba(255,255,255,1);
-      align:center;
-      text-align:center;
-      background-color:rgba(255,255,255,0.5);
-    }
-    #master{
-      position:fixed;
-      top:75%;
-      right:20%;
-      background:#ffc864;
-      width:90px;
-      height:40px;
-    }
-
-  </style>
 </html>

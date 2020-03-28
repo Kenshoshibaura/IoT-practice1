@@ -1,3 +1,4 @@
+
 setInterval('showClock()',1000);
 
 function set2fig(num){

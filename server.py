@@ -9,29 +9,18 @@ file_log = "./log_data.csv"
 
 port_num = 17086
 
-#残りserverで実装すること
-#各閾値の調整
-
-#html
-#オペレーターコマンドの認証実装
-#退出時間の警告発動
-
-#全体
-#値調整
-#センサ接続・調整
-
 #閾値・測定値の初期設定
-Threshold_Key = 10
+Threshold_Key = 30
 Threshold_Light = 10
 Now_Key = 0
 Now_Light = 0
 
 #利用可能時間の設定
-Start_Time = 204
+Start_Time = 700
 Limit_Time = 2200
 
 #閾値の周期変更値(辞書)
-Cycle_Time = {'500':'40', '800':'65', '1300':'80', '1700':'70', '1800':'55', '2100':'30'}
+Cycle_Time = {'500':10, '800':12, '1300':15, '1700':12, '1800':11, '2100':10}
 
 #桁揃え(0埋め)
 def set2fig(x):
@@ -76,10 +65,10 @@ def Check_Usable():
 def Cycle_Threshold():
     date=datetime.datetime.now()
     Now_Minute = set2fig(date.minute)
-    Now_Time = int(str(date.hour)+str(Now_Minute))
-    if (str(Now_Time) in Cycle_Time) is True:
+    Now_Time = str(date.hour)+str(Now_Minute)
+    if (Now_Time in Cycle_Time) is True:
         global Threshold_Light
-        Threshold_Light = int(Cycle_Time[str(Now_Time)])
+        Threshold_Light = Cycle_Time[Now_Time]
 
 #手動更新の際閾値を更新する(再起動するとリセットされるので注意)
 def Update_Threshold(situation):
@@ -88,20 +77,20 @@ def Update_Threshold(situation):
     Now_Key = data_from_file(file_key)
 
     if situation == "1":
-        New_Light = Now_Light - 50
-        New_Key = Now_Key - 50
+        New_Light = Now_Light - 10
+        New_Key = Now_Key - 30
     elif situation == "2":
-        New_Light = Now_Light + 50
-        New_Key = Now_Key + 50
+        New_Light = Now_Light + 10
+        New_Key = Now_Key + 30
     elif situation == "3":
         New_Light = Now_Light - 10
-        New_Key = Now_Key + 50
+        New_Key = Now_Key + 30
     elif situation == "4":
-        New_Light = Now_Light + 50
-        New_Key = Now_Key - 50
+        New_Light = Now_Light + 10
+        New_Key = Now_Key - 30
     elif situation == "5":
-        New_Light = Now_Light + 50
-        New_Key = Now_Key + 50
+        New_Light = Now_Light + 10
+        New_Key = Now_Key + 30
 
     global Threshold_Light
     global Threshold_Key
@@ -173,8 +162,7 @@ def get_lux():
     Cycle_Threshold()
     try:
         f = open(file_result,'r')
-        for row in f:
-            lux = row
+        lux = f.read()
     except Exception as e:
         print("FILE OPEN ERROR")
         lux = "0,0"
@@ -196,15 +184,10 @@ def send_log():
         f.close()
         return lux
 
-#手動入力用 強制的に閾値を更新することで状態を更新してる
-@app.route('/demo/<situation>',methods=['GET'])
-def get_situation_demo(situation):
-    Update_Threshold(situation)
-    return "0,0"
-
 #ログ受信用 4つ以上になった場合最新の4つ以外は削除する
 @app.route('/log/<logtext>',methods=['GET'])
 def get_log(logtext):
+
     f = open(file_log,'a')
     f.write(logtext+",")
     f.close()
@@ -214,11 +197,17 @@ def get_log(logtext):
     data = logtext.split(',')
     quantity = len(data)
     f.close()
+
     if quantity > 4:
         f = open(file_log,'w')
         f.write(data[quantity-5]+","+data[quantity-4]+","+data[quantity-3]+","+data[quantity-2]+",")
         f.close()
+    return "0,0"
 
+#手動入力用 強制的に閾値を更新することで状態を更新してる
+@app.route('/demo/<situation>',methods=['GET'])
+def get_situation_demo(situation):
+    Update_Threshold(situation)
     return "0,0"
 
 #退室勧告用 コンソールにコメントを出すだけ
