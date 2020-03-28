@@ -27,21 +27,8 @@
     <span id="exit" class="hidden">
       <button class="exit mybutton masterbutton" onclick="Submit('/alert','1')">退室勧告(未実装)</button>
     </span>
-    <span id="winsize"></span>
   </body>
   <script>
-
-    window_load();
-
-    window.onresize = window_load;
-
-    function window_load(){
-      var sW,sH,s;
-      sW = window.innerWidth;
-      sH = window.innerHeight;
-      s = "ウィンドウサイズ:横幅 = " + sW + " / 高さ = " + sH;
-      document.getElementById('winsize').innerHTML = s;
-    }
 
     var Before_Status=0;
     setInterval("Check()",5000);
@@ -121,7 +108,7 @@
           document.body.style.backgroundColor = "#646464";
           message.innerHTML="利用時間外です";
           banner("利用時間外","現在は利用時間外です");
-          if((Before_Status==1)||(Before_Status==4)){
+          if((Before_Status==1)||(Before_Status==3)||(Before_Status==4)){
             UpdateLog(1);
           }
         }else{

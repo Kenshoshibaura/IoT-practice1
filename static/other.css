@@ -79,7 +79,6 @@
     .exit{bottom:4%;}
     .demobutton{height:50px;}
     .masterbutton{height:50px;}
-
   }
   @media screen and (min-height:1000px){
     body{font-size:180%;}
@@ -88,5 +87,13 @@
     .exit{bottom:10%;}
     .demobutton{height:60px;}
     .masterbutton{height:60px;}
-
+  }
+  @media screen and (max-height:650px){
+    .area_status{top:10%;}
+  }
+  @media screen and (min-height:1400px){
+    body{font-size:200%;}
+    .area_status{top:18%;}
+    .demobutton{height:65px;}
+    .masterbutton{height:65px;}
   }
