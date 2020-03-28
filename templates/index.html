@@ -2,6 +2,8 @@
 <script type="text/javascript" src="ken.js"></script>
 <link rel="stylesheet" href="static/ken.css" type="text/css">
 <link rel="stylesheet" href="static/other.css" type="text/css">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <html><head><title>鍵管理アプリ</title></head>
   <body onLoad="Loading()">
     <span id="Realtime" class="time">00/00(0) 00:00:00</span>
@@ -25,8 +27,15 @@
       <button id="d4" class="mybutton demobutton" onclick="Submit('/demo','4')">4 不在</button>
     </span>
     <span id="exit" class="hidden">
-      <button class="exit mybutton masterbutton" onclick="Submit('/alert','1')">退室勧告(未実装)</button>
+      <button class="exit mybutton masterbutton" onclick="showAlert('退室勧告','勧告を行ってよろしいですか？','confirm','Alert()')">退室勧告(未実装)</button>
     </span>
+    <div class="bg" id="loadicon">
+      <div class="loading">
+        <p>通信中...</p>
+        <div class="way"><div class="round">●</div></div>
+        <button onclick="location.reload();">再読み込み</button>
+      </div>
+    </div>
   </body>
   <script>
 
@@ -62,6 +71,7 @@
       if(count==1){
         InitialLog();
         count=0
+        document.getElementById('loadicon').style.display = "none";
       }
       Receive('/lux','data');
       var data=document.getElementById('data');
@@ -162,6 +172,25 @@
       const return_from_server = await fetch(url2)
       .then(response => response.text())
       var response2 = `${return_from_server}`
+    }
+
+    function Alert(){
+      SlackMessage("退室時刻です");
+      Submit('/alert','1');
+      banner("完了","退室勧告を行いました");
+    }
+
+    const SlackMessage = async(message) => {
+      const url = "https://hooks.slack.com/services/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";
+      var form = {'text': message};
+      try{
+        var result = await (await fetch(url,{
+          method : 'POST',
+          body : JSON.stringify(form)
+        })).text();
+      }catch(e){
+        console.error(e);
+      }
     }
   </script>
 </html>

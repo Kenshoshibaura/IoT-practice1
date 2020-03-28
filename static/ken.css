@@ -109,3 +109,79 @@ body{text-shadow:1px 1px 0 #fff,-1px 1px 0 #fff,1px -1px 0 #fff,-1px -1px 0 #fff
     100%{display:block;padding-top: 20px;padding-bottom :20px;height:auto;}
   }
   /*ここまでアラート*/
+
+/*ここからローディング*/
+    .bg{
+      position:fixed;
+      top:0px;
+      right:0px;
+      width:100%;
+      height:100%;
+      background: rgba(0,0,0,0.5);
+      z-index:30;
+    }
+    .loading{
+      color: #FFF;
+      font-family: Gothic;
+      position :fixed;
+      top: 50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      text-shadow: none;
+      text-align: center;
+    }
+    .loading p{
+      font-size:150%;
+    }
+    .load{
+      left:50%;
+      width:100px;
+      height:100px;
+      border-radius: 100px;
+    }
+    .way{
+      position:static;
+      width:100%;
+      height:80px;
+      vertical-align: middle;
+    }
+    .round{
+    }
+    .round{
+      animation: animation-dash 5s ease-in-out 0s infinite normal;
+      transform:translate(-10%,-10%);
+      font-size:20px;
+      color: rgba(255,255,255,0.1);
+      width:auto;
+      position:relative;
+      vertical-align: middle;
+      width:0;
+      overflow: visible;
+    }
+    .loading button{
+      color: white;
+      background: rgba(0,0,0,0.2);
+      border-radius: 30px;
+      outline-color: white;
+      padding:10px;
+      border: 2px solid white;
+      animation: animation-button-appears 10s ease 0s;
+    }
+    .loading button:active {
+      border-color: #AAA;
+      color:#AAA;
+      background: rgba(0,0,0,0.4);
+
+    }
+    @keyframes animation-dash {
+      0%{left:0px;top:0%; font-size: 20px;color:rgba(255,255,255,0.01);}
+      20%{left:50%;top:0%; font-size: 30px;color:rgba(255,255,255,1);}
+      50%{left:100%;top:0%; font-size: 20px;color:rgba(255,255,255,0.01);}
+      70%{left:50%;top:0%; font-size: 30px;color:rgba(255,255,255,1);}
+      100%{left:0%;top:0%; font-size: 20px;color:rgba(255,255,255,0.01);}
+    }
+    @keyframes animation-button-appears{
+      0%{color: rgba(255,255,255,0);background: rgba(0,0,0,0.0);border-color:rgba(255,255,255,0);pointer-events: none;}
+      95%{color: rgba(255,255,255,0);background: rgba(0,0,0,0.0);border-color:rgba(255,255,255,0);pointer-events: none;}
+      100%{color: rgba(255,255,255,1);background: rgba(0,0,0,0.2);border-color:rgba(255,255,255,1);pointer-events: auto;}
+    }
