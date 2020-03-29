@@ -1,12 +1,16 @@
 <!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">
-<script type="text/javascript" src="ken.js"></script>
-<link rel="stylesheet" href="static/ken.css" type="text/css">
-<link rel="stylesheet" href="static/other.css" type="text/css">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<html><head><title>鍵管理アプリ</title></head>
+  <script type="text/javascript" src="ken.js"></script>
+  <script type="text/javascript" src="auth.js"></script>
+  <script type="text/javascript" src="secret.js"></script>
+  <link rel="stylesheet" href="static/ken.css" type="text/css">
+  <link rel="stylesheet" href="static/other.css" type="text/css">
+  <link rel="stylesheet" href="static/auth.css" type="text/css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>鍵管理アプリ</title></head>
   <body onLoad="Loading()">
     <span id="Realtime" class="time">00/00(0) 00:00:00</span>
+    <button class="reload mybutton" onclick="Check()">手動更新</button>
     <span id="data" class="hidden">4月1日 0時0分,0</span><br>
     <span id="log" class="hidden">0,0,0,0</span><br>
     <span class="area_status">
@@ -19,7 +23,7 @@
         <tr><td>0</td></tr><tr><td>1</td></tr><tr><td>2</td></tr><tr><td>3</td></tr>
       </table>
     </span>
-    <button class="master mybutton masterbutton" onclick="OperatorCommand()">管理者コマンド</button>
+    <button id="master" class="master mybutton masterbutton" onclick="auth.init(OperatorCommand,[],true)">管理者コマンド</button>
     <span id="demo" class="hidden">
       <button id="d1" class="mybutton demobutton" onclick="Submit('/demo','1')">1 在室</button>
       <button id="d2" class="mybutton demobutton" onclick="Submit('/demo','2')">2 施錠</button>
@@ -27,7 +31,7 @@
       <button id="d4" class="mybutton demobutton" onclick="Submit('/demo','4')">4 不在</button>
     </span>
     <span id="exit" class="hidden">
-      <button class="exit mybutton masterbutton" onclick="showAlert('退室勧告','勧告を行ってよろしいですか？','confirm','Alert()')">退室勧告(未実装)</button>
+      <button id="exal" class="exit mybutton masterbutton" onclick="showAlert('退室勧告','勧告を行ってよろしいですか？','confirm','Alert()')">退室勧告(未実装)</button>
     </span>
     <div class="bg" id="loadicon">
       <div class="loading">
@@ -38,7 +42,6 @@
     </div>
   </body>
   <script>
-
     var Before_Status=0;
     setInterval("Check()",5000);
     function Loading(){
@@ -85,6 +88,7 @@
           time=MakeTime();
           if(time=="2200"){
             Submit('/alert','1');
+            banner("退室時刻","退室時刻になりました");
           }
         }
       }else{
@@ -155,9 +159,19 @@
       var time=nowHour+set2fig(nowMin);
       return time;
     }
-    function OperatorCommand(){
+    function OperatorCommand(args,result){
+      //console.log(result);
+      var result2=result.split(',');
+      var Level=result2[1];
+      //console.log(Level);
       document.getElementById('demo').style.display="block";
       document.getElementById('exit').style.display="block";
+      if(parseInt(Level) < 2){
+        console.log("success");
+        document.getElementById('exal').disabled=true;
+      }
+      document.getElementById("master").disabled=true;
+
     }
 
     const Receive = async(url,element) => {
@@ -179,12 +193,11 @@
       Submit('/alert','1');
       banner("完了","退室勧告を行いました");
     }
-
     const SlackMessage = async(message) => {
-      const url = "https://hooks.slack.com/services/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";
+      //console.log(SlackURL);
       var form = {'text': message};
       try{
-        var result = await (await fetch(url,{
+        var result = await (await fetch(SlackURL,{
           method : 'POST',
           body : JSON.stringify(form)
         })).text();

@@ -132,11 +132,28 @@ def get_html():
 @app.route('/<files>', methods=['GET'])
 def get_files(files):
     return render_template('./'+files)
+@app.route('/<files>', methods=['POST'])
+def post_files(files):
+    id=request.form['id']
+    password=request.form['pass']
+    #print(id,password)
+    result = "false"
+    try:
+        f = open("./user/user.txt",'r')
+        for row in f:
+            lux = row
+            data = lux.split(',')
+            if (data[0] == id) and (data[1] == password):
+                result = "true," + data[2]
+    except Exception as e:
+        print("FILE OPEN ERROR")
+    finally:
+        f.close()
+        return result
 
 #センサからのデータを受信、データを更新
 @app.route('/lux', methods=['POST'])
 def update_lux():
-    #現在は照度センサの値の更新のみだが、鍵の情報更新もここに追加
     time=request.form["time"]
     lux=request.form["lux"]
     key=request.form["key"]

@@ -44,13 +44,19 @@
     height:45px;
     left:30%;
   }
+  .reload{
+    width:calc(15vw);
+    height:30px;
+  }
   #demo{
     position:fixed;
     left:18%;
     bottom:12%;
   }
+  .reload{position:fixed; top:5%; right:10%;}
   .master{bottom:20%;}
   .exit{bottom:4%;}
+  .reload{background:#ffc864;}
   .master{background:#ffc864;}
   .exit{background:#ff6464;}
 
