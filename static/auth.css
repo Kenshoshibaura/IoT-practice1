@@ -1,4 +1,5 @@
 /*jsと違って、基礎としてpopupとかのCSSがないとうまく起動しない*/
+
 .auth p input{
   border-radius: 50px;
   font-size:100%;

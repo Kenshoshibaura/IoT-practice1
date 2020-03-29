@@ -16,7 +16,7 @@ Now_Key = 0
 Now_Light = 0
 
 #利用可能時間の設定
-Start_Time = 700
+Start_Time = 600
 Limit_Time = 2200
 
 #閾値の周期変更値(辞書)

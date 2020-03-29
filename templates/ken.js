@@ -63,7 +63,6 @@ showAlert(title,txt[,popup[,fn]])
 
   Ex.)　showAlert('テストです','このコンファームはテストです。','confirm','banner("やったー","コンファームが無事使えたよ！")');
         showAlert('テスト','自動的に消えます。');
-
 */
 //ここからバナー
 function banner(title,text,detail = text){

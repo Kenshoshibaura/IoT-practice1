@@ -6,7 +6,7 @@
 
   -認証を行う時の呼び出し関数
     auth.init(実行したい関数,(※任意)[実行したい関数の引数(配列)],(※任意)記憶のチェックボックス);
-
+    auth.init(OperatorCommand,[],true);
 */
 var auth= {
   auth_path:window.location.protocol + '//' + window.location.host+"/"+"auth",

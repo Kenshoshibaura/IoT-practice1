@@ -91,6 +91,7 @@
     #demo{bottom:20%;}
     .master{bottom:30%;}
     .exit{bottom:10%;}
+    .reload{height:50px;}
     .demobutton{height:60px;}
     .masterbutton{height:60px;}
   }
@@ -100,6 +101,7 @@
   @media screen and (min-height:1400px){
     body{font-size:200%;}
     .area_status{top:18%;}
+    .reload{height:60px;}
     .demobutton{height:65px;}
     .masterbutton{height:65px;}
   }
