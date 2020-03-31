@@ -5,12 +5,12 @@
   <link rel="stylesheet" href="static/ken.css" type="text/css">
   <link rel="stylesheet" href="static/other.css" type="text/css">
   <link rel="stylesheet" href="static/auth.css" type="text/css">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<!--  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">-->
 <title>鍵管理アプリ</title></head>
   <body onLoad="Loading()">
     <span id="Realtime" class="time">00/00(0) 00:00:00</span>
-    <button class="reload mybutton" onclick="Check()">手動更新</button>
+    <!--<button class="reload mybutton" onclick="Check()">手動更新</button>-->
     <span id="data" class="hidden">4月1日 0時0分,0</span><br>
     <span id="log" class="hidden">0,0,0,0</span><br>
     <span class="area_status">
@@ -87,6 +87,7 @@
         if((Now_status==1)||(Now_status==4)){
           time=MakeTime();
           if(time=="2200"){
+            SlackMessage("〜退室時刻です〜");
             Submit('/alert','1');
             banner("退室時刻","退室時刻になりました");
           }
@@ -187,7 +188,7 @@
     }
 
     function Alert(){
-      SlackMessage("退室時刻です");
+      SlackMessage("〜退室勧告〜");
       Submit('/alert','1');
       banner("完了","退室勧告を行いました");
     }

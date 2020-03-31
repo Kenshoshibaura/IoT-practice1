@@ -107,7 +107,7 @@ function showAlert(title,txt,popup="hidden",fn=function(){}){
   div1.appendChild(div2);
   document.getElementsByTagName('body')[0].appendChild(div1);
   console.log();
-  if(popup=="hidden"){
+  if(popup!="noClose"){//popup=="hidden"
     div2.appendChild(time);
     console.log(time.innerHTML.replace(/[^0-9]/g,""));
     var timeout = setInterval(function(time){time.innerHTML = "Auto Close : "+(parseInt(time.innerHTML.replace(/[^0-9]/g,""))-1)+" sec.";},1000,time);

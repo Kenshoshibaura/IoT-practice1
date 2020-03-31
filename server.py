@@ -36,13 +36,14 @@ def reload_time():
     return now_time
 
 #ファイルの中身を調べ、第2項目の値(int)を返す
-def data_from_file(file_path):
+def data_from_file(file_path,n):
     try:
         f = open(file_path,'r')
         for row in f:
             lux = row
+        lux2 = lux.replace('\n','')
         data = lux.split(',')
-        Now = int(data[1])
+        Now = int(float(data[n]))
     except Exception as e:
         print("FILE OPEN ERROR")
         Now = 0
@@ -73,24 +74,24 @@ def Cycle_Threshold():
 #手動更新の際閾値を更新する(再起動するとリセットされるので注意)
 def Update_Threshold(situation):
 
-    Now_Light = data_from_file(file_sensor)
-    Now_Key = data_from_file(file_key)
+    Now_Light = data_from_file(file_sensor,1)
+    Now_Key = data_from_file(file_key,1)
 
     if situation == "1":
-        New_Light = Now_Light - 10
-        New_Key = Now_Key - 30
+        New_Light = Now_Light - 5
+        New_Key = Now_Key - 10
     elif situation == "2":
-        New_Light = Now_Light + 10
-        New_Key = Now_Key + 30
+        New_Light = Now_Light + 5
+        New_Key = Now_Key + 5
     elif situation == "3":
-        New_Light = Now_Light - 10
-        New_Key = Now_Key + 30
+        New_Light = Now_Light - 5
+        New_Key = Now_Key + 10
     elif situation == "4":
-        New_Light = Now_Light + 10
-        New_Key = Now_Key - 30
+        New_Light = Now_Light + 5
+        New_Key = Now_Key - 10
     elif situation == "5":
-        New_Light = Now_Light + 10
-        New_Key = Now_Key + 30
+        New_Light = Now_Light + 5
+        New_Key = Now_Key + 10
 
     global Threshold_Light
     global Threshold_Key
@@ -100,9 +101,10 @@ def Update_Threshold(situation):
 #状態を更新
 def Update_Judge():
 
-    Now_Light = data_from_file(file_sensor)
-    Now_Key = data_from_file(file_key)
-    Now_Result = data_from_file(file_result)
+    Now_Light = data_from_file(file_sensor,1)
+    Now_Key = data_from_file(file_key,1)
+    Now_Result = data_from_file(file_result,1)
+    New_Result = data_from_file(file_result,2)
 
     if Now_Key >= Threshold_Key:#解錠中
         if Now_Light >= Threshold_Light:#照明on
@@ -118,11 +120,19 @@ def Update_Judge():
             else:
                 Result = 5
 
-    if Now_Result != Result:
-        now_time = reload_time()
-        f = open(file_result,'w')
-        f.write(now_time+","+str(Result))
-        f.close()
+    now_time = reload_time()
+    f = open(file_result,'w')
+
+    if (Now_Result != Result) and (New_Result == Result):
+        f.write(now_time+","+str(Result)+","+str(Result))
+        print("リザルトが"+str(Result)+"に変化しました")
+    elif (Now_Result != Result) and (New_Result != Result):
+        f.write(now_time+","+str(Now_Result)+","+str(Result))
+        print("センサ値が"+str(Result)+"に変化しました")
+    else:
+        f.write(now_time+","+str(Now_Result)+","+str(Result))
+
+    f.close()
 
 #初期接続
 @app.route('/', methods=['GET'])
@@ -174,15 +184,15 @@ def update_lux():
 #クライアントからの更新要求 resultの中身を読んで返す
 @app.route('/lux',methods=['GET'])
 def get_lux():
-    lux = "0,0"
+    lux = "0,0,0"
     Update_Judge()
     Cycle_Threshold()
     try:
         f = open(file_result,'r')
         lux = f.read()
     except Exception as e:
-        print("FILE OPEN ERROR")
-        lux = "0,0"
+        print("FILE OPEN ERROR:result")
+        lux = "0,0,0"
     finally:
         f.close()
         return lux
@@ -195,7 +205,7 @@ def send_log():
         f = open(file_log,'r')
         lux = f.read()
     except Exception as e:
-        print("FILE OPEN ERROR")
+        print("FILE OPEN ERROR:log")
         lux = "0,0"
     finally:
         f.close()
