@@ -77,6 +77,8 @@
         document.getElementById('loadicon').style.display = "none";
       }
       Receive('/lux','data');
+      Receive('/getlog','log');//
+      InitialLog();//
       var data=document.getElementById('data');
       var Now_data=data.innerHTML;
       var Now_data2=Now_data.split(',');
@@ -138,20 +140,22 @@
       var status = new Array("解錠","施錠");
       var Operation=document.getElementById('Operation');
       var LockTime=document.getElementById('LockTime');
-      var table=document.getElementById('log_table');
+      //var table=document.getElementById('log_table');
       var data=document.getElementById('data');
       var Now_data=data.innerHTML;
       var Now_data2=Now_data.split(',');
       var time=Now_data2[0];
-      var row_len=table.rows.length;
-      var row=table.insertRow(0);
-      var cell=row.insertCell(-1);
+      //var row_len=table.rows.length;
+      //var row=table.insertRow(0);
+      //var cell=row.insertCell(-1);
       LockTime.innerHTML=time;
       Operation.innerHTML=status[s];
-      cell.innerHTML=time+" "+status[s];
-      table.deleteRow(row_len);
-      var message = cell.innerHTML;
-      Submit('/log',message);
+      //cell.innerHTML=time+" "+status[s];
+      //table.deleteRow(row_len);
+      //var message = cell.innerHTML;
+      //Submit('/log',message);
+      Receive('/getlog','log');
+      InitialLog();
     }
     function MakeTime(){
       var nowTime=new Date();

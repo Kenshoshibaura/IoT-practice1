@@ -71,6 +71,32 @@ def Cycle_Threshold():
         global Threshold_Light
         Threshold_Light = Cycle_Time[Now_Time]
 
+#ログを書き換える
+def update_log(Result):
+
+    conversion = {0:'解錠', 1:'施錠'}
+
+    now_time = reload_time()
+    result = conversion[int(Result)]
+    logtext=now_time+" "+result
+    print(logtext)
+
+    f = open(file_log,'a')
+    f.write(logtext+",")
+    f.close()
+
+    f = open(file_log,'r')
+    logtext = f.read()
+    data = logtext.split(',')
+    quantity = len(data)
+    f.close()
+
+    if quantity > 4:
+        f = open(file_log,'w')
+        f.write(data[quantity-5]+","+data[quantity-4]+","+data[quantity-3]+","+data[quantity-2]+",")
+        f.close()
+
+
 #手動更新の際閾値を更新する(再起動するとリセットされるので注意)
 def Update_Threshold(situation):
 
@@ -107,11 +133,13 @@ def Update_Judge():
     New_Result = data_from_file(file_result,2)
 
     if Now_Key >= Threshold_Key:#解錠中
+        Key2 = 0
         if Now_Light >= Threshold_Light:#照明on
             Result = 1
         else:
             Result = 4
     else:#施錠中
+        Key2 = 1
         if Now_Light >= Threshold_Light:
             Result = 3
         else:
@@ -126,6 +154,12 @@ def Update_Judge():
     if (Now_Result != Result) and (New_Result == Result):
         f.write(now_time+","+str(Result)+","+str(Result))
         print("リザルトが"+str(Result)+"に変化しました")
+        if (Now_Result == 1) or (Now_Result == 4):
+            Key1 = 0
+        else:
+            Key1 = 1
+        if (Key1 != Key2):
+            update_log(Key2)
     elif (Now_Result != Result) and (New_Result != Result):
         f.write(now_time+","+str(Now_Result)+","+str(Result))
         print("センサ値が"+str(Result)+"に変化しました")
@@ -197,7 +231,7 @@ def get_lux():
         f.close()
         return lux
 
-#初期接続時にログデータを送信
+#ログデータを送信
 @app.route('/getlog',methods=['GET'])
 def send_log():
     lux = "0,0"
@@ -210,26 +244,6 @@ def send_log():
     finally:
         f.close()
         return lux
-
-#ログ受信用 4つ以上になった場合最新の4つ以外は削除する
-@app.route('/log/<logtext>',methods=['GET'])
-def get_log(logtext):
-
-    f = open(file_log,'a')
-    f.write(logtext+",")
-    f.close()
-
-    f = open(file_log,'r')
-    logtext = f.read()
-    data = logtext.split(',')
-    quantity = len(data)
-    f.close()
-
-    if quantity > 4:
-        f = open(file_log,'w')
-        f.write(data[quantity-5]+","+data[quantity-4]+","+data[quantity-3]+","+data[quantity-2]+",")
-        f.close()
-    return "0,0"
 
 #手動入力用 強制的に閾値を更新することで状態を更新してる
 @app.route('/demo/<situation>',methods=['GET'])
